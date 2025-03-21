@@ -1,12 +1,19 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { Home, Menu, Search } from "lucide-react";
+import { Home, Menu, Search, LogIn, User } from "lucide-react";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 
 export const Header = () => {
+  // This would be replaced with actual auth state management in a real app
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <Container className="flex h-14 items-center">
@@ -25,10 +32,30 @@ export const Header = () => {
         </div>
 
         <div className="ml-auto flex items-center gap-2">
-          <NotificationCenter />
-          <Button size="icon" variant="ghost">
-            <Search className="h-4 w-4" />
-          </Button>
+          {isLoggedIn ? (
+            <>
+              <NotificationCenter />
+              <Button size="icon" variant="ghost">
+                <Search className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleLogout} className="hidden md:flex">
+                <User className="h-4 w-4 mr-2" /> Profile
+              </Button>
+            </>
+          ) : (
+            <>
+              <Link to="/login">
+                <Button variant="outline" size="sm" className="hidden md:flex">
+                  <LogIn className="h-4 w-4 mr-2" /> Login
+                </Button>
+              </Link>
+              <Link to="/register">
+                <Button size="sm" className="hidden md:flex">
+                  Register
+                </Button>
+              </Link>
+            </>
+          )}
           <Button size="icon" variant="ghost" className="md:hidden">
             <Menu className="h-4 w-4" />
           </Button>
