@@ -18,14 +18,15 @@ export const Header = () => {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <Container className="flex h-14 items-center">
         <div className="flex items-center gap-1 mr-4">
-          <Link to="/" className="font-semibold">
-            Tuition Query Tracker
+          <Link to="/" className="font-semibold text-xl">
+            QUETRAS
           </Link>
         </div>
         <div className="hidden md:flex items-center gap-5 text-sm text-muted-foreground">
           <Link to="/" className="text-foreground">
-            Dashboard
+            Home
           </Link>
+          <Link to="/dashboard">Dashboard</Link>
           <Link to="/queries">Queries</Link>
           <Link to="#">Students</Link>
           <Link to="#">Reports</Link>
