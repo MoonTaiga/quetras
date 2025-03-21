@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useAuth } from "@/contexts/AuthContext";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -28,6 +30,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -37,17 +40,11 @@ const Login = () => {
     },
   });
 
-  const onSubmit = (data: LoginFormValues) => {
-    console.log("Login attempt:", data);
-    
-    // In a real application, this would make an API call to authenticate
-    // For now, we'll simulate a successful login
-    setTimeout(() => {
-      toast.success("Login successful", {
-        description: "Welcome back to the Tuition Query Tracker!",
-      });
-      navigate("/");
-    }, 1000);
+  const onSubmit = async (data: LoginFormValues) => {
+    const success = await login(data.email, data.password);
+    if (success) {
+      navigate("/dashboard");
+    }
   };
 
   return (
@@ -60,6 +57,12 @@ const Login = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <Alert className="mb-4 bg-muted">
+            <AlertDescription>
+              This is a demo application. Register first to create an account, then use those credentials to log in.
+            </AlertDescription>
+          </Alert>
+          
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField

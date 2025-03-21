@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/contexts/AuthContext";
 
 const registerSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -33,6 +34,7 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 const Register = () => {
   const navigate = useNavigate();
+  const { register } = useAuth();
   
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -44,17 +46,11 @@ const Register = () => {
     },
   });
 
-  const onSubmit = (data: RegisterFormValues) => {
-    console.log("Registration data:", data);
-    
-    // In a real application, this would make an API call to create an account
-    // For now, we'll simulate a successful registration
-    setTimeout(() => {
-      toast.success("Registration successful", {
-        description: "Your account has been created!",
-      });
-      navigate("/login");
-    }, 1000);
+  const onSubmit = async (data: RegisterFormValues) => {
+    const success = await register(data.name, data.email, data.password);
+    if (success) {
+      navigate("/dashboard");
+    }
   };
 
   return (

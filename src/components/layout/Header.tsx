@@ -1,17 +1,19 @@
 
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { Home, Menu, Search, LogIn, User } from "lucide-react";
+import { Home, Menu, Search, LogIn, User, LogOut } from "lucide-react";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const Header = () => {
-  // This would be replaced with actual auth state management in a real app
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isLoggedIn, user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
+    logout();
+    navigate("/");
   };
 
   return (
@@ -39,8 +41,11 @@ export const Header = () => {
               <Button size="icon" variant="ghost">
                 <Search className="h-4 w-4" />
               </Button>
+              <div className="hidden md:block mr-2 text-sm">
+                Welcome, <span className="font-medium">{user?.name}</span>
+              </div>
               <Button variant="outline" size="sm" onClick={handleLogout} className="hidden md:flex">
-                <User className="h-4 w-4 mr-2" /> Profile
+                <LogOut className="h-4 w-4 mr-2" /> Logout
               </Button>
             </>
           ) : (
