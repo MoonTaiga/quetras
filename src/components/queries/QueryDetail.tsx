@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { Calendar, Clock, DollarSign, User } from "lucide-react";
+import { Calendar, Clock, DollarSign, User, Bell } from "lucide-react";
+import { notificationService } from "@/lib/notification-service";
 
 export interface QueryDetailData {
   id: string;
@@ -30,6 +31,15 @@ interface QueryDetailProps {
 }
 
 const QueryDetail = ({ query, className }: QueryDetailProps) => {
+  // Function to send a notification to the student
+  const sendNotification = () => {
+    notificationService.sendNotification(
+      query.studentId,
+      `Update on Query #${query.id}`,
+      `Your ${query.queryTitle.toLowerCase()} query has been updated. Current status: ${query.status}.`
+    );
+  };
+
   return (
     <div className={cn("space-y-6", className)}>
       <Card className="overflow-hidden">
@@ -106,6 +116,14 @@ const QueryDetail = ({ query, className }: QueryDetailProps) => {
           <div className="mt-6 flex flex-wrap gap-3">
             <Button>Update Status</Button>
             <Button variant="outline">Add Note</Button>
+            <Button 
+              variant="outline"
+              onClick={sendNotification}
+              className="flex items-center gap-2"
+            >
+              <Bell className="h-4 w-4" />
+              Notify Student
+            </Button>
           </div>
         </CardContent>
       </Card>

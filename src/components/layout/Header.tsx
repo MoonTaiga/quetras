@@ -1,66 +1,39 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { cn } from "@/lib/utils";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Home, Menu, Search } from "lucide-react";
+import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 
-interface HeaderProps extends React.HTMLAttributes<HTMLElement> {
-  transparent?: boolean;
-}
-
-const Header = ({ className, transparent = false, ...props }: HeaderProps) => {
+export const Header = () => {
   return (
-    <header
-      className={cn(
-        "sticky top-0 z-50 w-full py-4",
-        transparent ? "bg-transparent" : "glass",
-        "transition-all duration-200 ease-apple",
-        className
-      )}
-      {...props}
-    >
-      <Container>
-        <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="h-8 w-8 rounded-full bg-primary"></div>
-            <span className="text-lg font-medium">TuitionQuery</span>
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <Container className="flex h-14 items-center">
+        <div className="flex items-center gap-1 mr-4">
+          <Link to="/" className="font-semibold">
+            Tuition Query Tracker
           </Link>
-          
-          <div className="flex items-center space-x-6">
-            <nav className="hidden md:flex space-x-6">
-              <NavLink to="/">Dashboard</NavLink>
-              <NavLink to="/queries">Queries</NavLink>
-            </nav>
-            
-            <Button variant="outline" size="icon" className="rounded-full">
-              <Search className="h-4 w-4" />
-            </Button>
-          </div>
+        </div>
+        <div className="hidden md:flex items-center gap-5 text-sm text-muted-foreground">
+          <Link to="/" className="text-foreground">
+            Dashboard
+          </Link>
+          <Link to="/queries">Queries</Link>
+          <Link to="#">Students</Link>
+          <Link to="#">Reports</Link>
+        </div>
+
+        <div className="ml-auto flex items-center gap-2">
+          <NotificationCenter />
+          <Button size="icon" variant="ghost">
+            <Search className="h-4 w-4" />
+          </Button>
+          <Button size="icon" variant="ghost" className="md:hidden">
+            <Menu className="h-4 w-4" />
+          </Button>
         </div>
       </Container>
     </header>
   );
 };
-
-interface NavLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
-  to: string;
-}
-
-const NavLink = ({ to, children, className, ...props }: NavLinkProps) => {
-  return (
-    <Link
-      to={to}
-      className={cn(
-        "text-sm font-medium text-muted-foreground hover:text-foreground transition-colors",
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </Link>
-  );
-};
-
-export { Header };
