@@ -1,12 +1,13 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { Calendar, Clock, DollarSign, User, Bell } from "lucide-react";
+import { Calendar, Clock, DollarSign, User, Bell, X } from "lucide-react";
 import { notificationService } from "@/lib/notification-service";
+import { useAuth } from "@/contexts/AuthContext";
 
 export interface QueryDetailData {
   id: string;
@@ -31,6 +32,10 @@ interface QueryDetailProps {
 }
 
 const QueryDetail = ({ query, className }: QueryDetailProps) => {
+  const { user, isAdmin } = useAuth();
+  const [showNoteForm, setShowNoteForm] = useState(false);
+  const [note, setNote] = useState("");
+  
   // Function to send a notification to the student
   const sendNotification = () => {
     notificationService.sendNotification(
@@ -38,6 +43,22 @@ const QueryDetail = ({ query, className }: QueryDetailProps) => {
       `Update on Query #${query.id}`,
       `Your ${query.queryTitle.toLowerCase()} query has been updated. Current status: ${query.status}.`
     );
+  };
+
+  // Function to cancel a query (for users)
+  const cancelQuery = () => {
+    // In a real app, this would make an API call to update the query status
+    alert("Query cancelled. In a real application, this would update the database.");
+  };
+
+  // Function to add a note (for admins)
+  const addNote = () => {
+    if (note.trim()) {
+      // In a real app, this would make an API call to add the note to the query
+      alert(`Note added: "${note}". In a real application, this would update the database.`);
+      setShowNoteForm(false);
+      setNote("");
+    }
   };
 
   return (
@@ -113,17 +134,63 @@ const QueryDetail = ({ query, className }: QueryDetailProps) => {
             <p className="mt-2 text-sm text-muted-foreground">{query.description}</p>
           </div>
 
+          {showNoteForm && isAdmin && (
+            <div className="mt-6 bg-muted p-4 rounded-lg">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-sm font-medium">Add Note</h3>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => setShowNoteForm(false)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              <textarea 
+                className="w-full p-2 border rounded-md mb-2 bg-background"
+                rows={3}
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Enter your note here..."
+              />
+              <Button onClick={addNote}>Submit Note</Button>
+            </div>
+          )}
+
           <div className="mt-6 flex flex-wrap gap-3">
-            <Button>Update Status</Button>
-            <Button variant="outline">Add Note</Button>
-            <Button 
-              variant="outline"
-              onClick={sendNotification}
-              className="flex items-center gap-2"
-            >
-              <Bell className="h-4 w-4" />
-              Notify Student
-            </Button>
+            {isAdmin ? (
+              // Admin-only actions
+              <>
+                <Button>Update Status</Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowNoteForm(true)}
+                >
+                  Add Note
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={sendNotification}
+                  className="flex items-center gap-2"
+                >
+                  <Bell className="h-4 w-4" />
+                  Notify Student
+                </Button>
+              </>
+            ) : (
+              // User-only actions
+              <>
+                <Button>Add Query</Button>
+                <Button 
+                  variant="outline"
+                  onClick={cancelQuery}
+                  className="flex items-center gap-2 text-destructive"
+                >
+                  <X className="h-4 w-4" />
+                  Cancel Query
+                </Button>
+              </>
+            )}
           </div>
         </CardContent>
       </Card>
