@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/contexts/AuthContext";
-import { User } from "lucide-react";
+import { User, ArrowLeft } from "lucide-react";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -61,8 +61,18 @@ const Login = () => {
     <Container className="flex items-center justify-center min-h-screen">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <div className="flex justify-center mb-2">
-            <User className="h-10 w-10 text-primary" />
+          <div className="flex justify-between items-center mb-2">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => navigate("/")}
+              className="text-muted-foreground"
+              aria-label="Back to home"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <User className="h-10 w-10 text-primary mx-auto" />
+            <div className="w-10"></div> {/* Spacer for alignment */}
           </div>
           <CardTitle className="text-2xl font-bold text-center">User Login</CardTitle>
           <CardDescription className="text-center">
