@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { Calendar, Clock, DollarSign, User, Bell, X } from "lucide-react";
+import { Calendar, Clock, DollarSign, User, Bell, X, Plus } from "lucide-react";
 import { notificationService } from "@/lib/notification-service";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export interface QueryDetailData {
   id: string;
@@ -33,6 +34,7 @@ interface QueryDetailProps {
 
 const QueryDetail = ({ query, className }: QueryDetailProps) => {
   const { user, isAdmin } = useAuth();
+  const navigate = useNavigate();
   const [showNoteForm, setShowNoteForm] = useState(false);
   const [note, setNote] = useState("");
   
@@ -59,6 +61,11 @@ const QueryDetail = ({ query, className }: QueryDetailProps) => {
       setShowNoteForm(false);
       setNote("");
     }
+  };
+
+  // Function to navigate to the new query page
+  const handleAddQuery = () => {
+    navigate("/query/new");
   };
 
   return (
@@ -180,7 +187,10 @@ const QueryDetail = ({ query, className }: QueryDetailProps) => {
             ) : (
               // User-only actions
               <>
-                <Button>Add Query</Button>
+                <Button onClick={handleAddQuery} className="flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  Add Query
+                </Button>
                 <Button 
                   variant="outline"
                   onClick={cancelQuery}

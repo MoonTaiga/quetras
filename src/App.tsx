@@ -9,6 +9,7 @@ import Home from "./pages/Home";
 import Index from "./pages/Index";
 import Queries from "./pages/Queries";
 import QueryView from "./pages/QueryView";
+import NewQuery from "./pages/NewQuery";
 import UserProfile from "./pages/UserProfile";
 import Login from "./pages/Login";
 import AdminLogin from "./pages/AdminLogin";
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/dashboard" element={<Index />} />
             <Route path="/queries" element={<Queries />} />
             <Route path="/query/:id" element={<QueryView />} />
+            <Route path="/query/new" element={<NewQuery />} />
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/login" element={<Login />} />
             <Route path="/admin-login" element={<AdminLogin />} />
