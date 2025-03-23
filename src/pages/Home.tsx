@@ -1,104 +1,88 @@
 
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect } from "react";
 import { Header } from "@/components/layout/Header";
-import { Container } from "@/components/ui/container";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, BookOpen, FileText, Shield, Users } from "lucide-react";
+import { setupAdminUser } from "@/utils/setupAdmin";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Home = () => {
+  useEffect(() => {
+    // Set up admin user for testing - would be removed in production
+    setupAdminUser();
+  }, []);
+
+  const { isLoggedIn, isAdmin } = useAuth();
+
   return (
-    <main className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col">
       <Header />
-      <div className="flex-1">
-        <section className="py-12 md:py-24 lg:py-32 xl:py-40 bg-gradient-to-b from-background to-muted">
-          <Container>
-            <div className="flex flex-col items-center text-center space-y-4">
-              <h1 className="text-3xl md:text-5xl font-bold tracking-tighter">
-                Welcome to <span className="text-primary">QUETRAS</span>
-              </h1>
-              <p className="text-xl text-muted-foreground max-w-[700px] mx-auto">
-                Your complete tuition query tracking and resolution system
+      <main className="flex-1 container mx-auto p-6">
+        <section className="max-w-4xl mx-auto text-center py-12">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Welcome to QUETRAS</h1>
+          <p className="text-xl text-muted-foreground mb-8">
+            A comprehensive query tracking and response system for educational institutions
+          </p>
+          
+          {isLoggedIn ? (
+            <div className="p-6 bg-muted rounded-lg shadow-sm">
+              <h2 className="text-2xl font-semibold mb-3">
+                Welcome back, {isAdmin ? "Administrator" : "User"}
+              </h2>
+              <p className="mb-4">
+                {isAdmin 
+                  ? "You have administrator access. You can manage users, view all queries, and more."
+                  : "You're logged in as a regular user. You can submit queries and view your query history."}
               </p>
-              <div className="flex flex-wrap justify-center gap-4 mt-8">
-                <Button size="lg" asChild>
-                  <Link to="/queries">
-                    View Queries <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-                <Button size="lg" variant="outline" asChild>
-                  <Link to="/login">Get Started</Link>
-                </Button>
-              </div>
-            </div>
-          </Container>
-        </section>
-
-        <section className="py-20 bg-background">
-          <Container>
-            <h2 className="text-3xl font-bold text-center mb-12">Key Features</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              <div className="flex flex-col items-center text-center p-6 rounded-lg border bg-card">
-                <FileText className="h-12 w-12 text-primary mb-4" />
-                <h3 className="text-xl font-medium mb-2">Query Management</h3>
-                <p className="text-muted-foreground">Track and resolve student tuition queries efficiently</p>
-              </div>
-              <div className="flex flex-col items-center text-center p-6 rounded-lg border bg-card">
-                <Users className="h-12 w-12 text-primary mb-4" />
-                <h3 className="text-xl font-medium mb-2">Student Notifications</h3>
-                <p className="text-muted-foreground">Keep students informed about their query status</p>
-              </div>
-              <div className="flex flex-col items-center text-center p-6 rounded-lg border bg-card">
-                <BookOpen className="h-12 w-12 text-primary mb-4" />
-                <h3 className="text-xl font-medium mb-2">Comprehensive Reports</h3>
-                <p className="text-muted-foreground">Generate detailed financial and query reports</p>
-              </div>
-              <div className="flex flex-col items-center text-center p-6 rounded-lg border bg-card">
-                <Shield className="h-12 w-12 text-primary mb-4" />
-                <h3 className="text-xl font-medium mb-2">Secure System</h3>
-                <p className="text-muted-foreground">Protected student and financial information</p>
-              </div>
-            </div>
-          </Container>
-        </section>
-
-        <section className="py-20 bg-muted">
-          <Container>
-            <div className="flex flex-col md:flex-row gap-12 items-center">
-              <div className="flex-1">
-                <h2 className="text-3xl font-bold mb-4">Start Using QUETRAS Today</h2>
-                <p className="text-muted-foreground mb-6">
-                  Streamline your tuition query management process and improve student satisfaction
-                  with our comprehensive tracking system.
-                </p>
-                <Button asChild>
-                  <Link to="/register">Create an Account</Link>
-                </Button>
-              </div>
-              <div className="flex-1 flex justify-center">
-                <div className="relative h-[300px] w-[400px] bg-card rounded-lg border flex items-center justify-center">
-                  <div className="text-muted-foreground">Application Screenshot</div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                <div className="p-4 bg-background rounded-md shadow">
+                  <h3 className="font-medium">Quick Actions</h3>
+                  <ul className="mt-2 space-y-1 text-sm">
+                    <li>• View your dashboard</li>
+                    <li>• Submit a new query</li>
+                    <li>• Check query status</li>
+                  </ul>
+                </div>
+                <div className="p-4 bg-background rounded-md shadow">
+                  <h3 className="font-medium">Recent Updates</h3>
+                  <ul className="mt-2 space-y-1 text-sm">
+                    <li>• New query response system</li>
+                    <li>• Improved user interface</li>
+                    <li>• Better notification system</li>
+                  </ul>
                 </div>
               </div>
             </div>
-          </Container>
-        </section>
-
-        <footer className="py-8 border-t">
-          <Container>
-            <div className="flex flex-col md:flex-row justify-between items-center">
-              <div className="mb-4 md:mb-0">
-                <h2 className="font-bold text-lg">QUETRAS</h2>
-                <p className="text-sm text-muted-foreground">Tuition Query Tracking System</p>
-              </div>
-              <div className="text-sm text-muted-foreground">
-                © {new Date().getFullYear()} QUETRAS. All rights reserved.
+          ) : (
+            <div className="space-y-8">
+              <div className="bg-muted p-6 rounded-lg">
+                <h2 className="text-2xl font-semibold mb-4">Get Started with QUETRAS</h2>
+                <p className="mb-4">Create an account or log in to begin tracking your queries</p>
+                <div className="flex flex-col sm:flex-row justify-center gap-4 mt-6">
+                  <div className="flex-1 bg-background p-4 rounded-md shadow text-center">
+                    <h3 className="font-medium mb-2">For Students & Staff</h3>
+                    <p className="text-sm mb-4">Submit and track your academic queries</p>
+                    <div className="text-sm text-muted-foreground">
+                      Login with your user account
+                    </div>
+                  </div>
+                  <div className="flex-1 bg-background p-4 rounded-md shadow text-center">
+                    <h3 className="font-medium mb-2">For Administrators</h3>
+                    <p className="text-sm mb-4">Manage the system and oversee all queries</p>
+                    <div className="text-sm text-muted-foreground">
+                      Login with admin credentials
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </Container>
-        </footer>
-      </div>
-    </main>
+          )}
+        </section>
+      </main>
+      <footer className="bg-muted py-6">
+        <div className="container mx-auto px-6 text-center text-sm text-muted-foreground">
+          <p>© 2023 QUETRAS. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
   );
 };
 

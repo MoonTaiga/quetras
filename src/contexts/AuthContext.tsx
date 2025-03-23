@@ -2,15 +2,19 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { toast } from "sonner";
 
+type UserRole = "admin" | "user";
+
 type User = {
   id: string;
   name: string;
   email: string;
+  role: UserRole;
 };
 
 type AuthContextType = {
   user: User | null;
   isLoggedIn: boolean;
+  isAdmin: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   register: (name: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
@@ -21,6 +25,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   useEffect(() => {
     // Check if user is logged in when component mounts
@@ -30,6 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const parsedUser = JSON.parse(storedUser);
         setUser(parsedUser);
         setIsLoggedIn(true);
+        setIsAdmin(parsedUser.role === "admin");
       } catch (error) {
         console.error("Failed to parse stored user:", error);
         localStorage.removeItem("quetras_user");
@@ -59,15 +65,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const authenticatedUser = {
         id: foundUser.id,
         name: foundUser.name,
-        email: foundUser.email
+        email: foundUser.email,
+        role: foundUser.role || "user" // Default to "user" if role is not set
       };
       
       // Store in state and localStorage
       setUser(authenticatedUser);
       setIsLoggedIn(true);
+      setIsAdmin(authenticatedUser.role === "admin");
       localStorage.setItem("quetras_user", JSON.stringify(authenticatedUser));
       
-      toast.success("Login successful");
+      toast.success(`Login successful as ${authenticatedUser.role}`);
       return true;
     } catch (error) {
       console.error("Login error:", error);
@@ -95,7 +103,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: Date.now().toString(),
         name,
         email,
-        password // Note: In a real app, you would hash this password
+        password, // Note: In a real app, you would hash this password
+        role: "user" // Default role for new registrations
       };
       
       // Add to users array
@@ -106,11 +115,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const authenticatedUser = {
         id: newUser.id,
         name: newUser.name,
-        email: newUser.email
+        email: newUser.email,
+        role: newUser.role
       };
       
       setUser(authenticatedUser);
       setIsLoggedIn(true);
+      setIsAdmin(authenticatedUser.role === "admin");
       localStorage.setItem("quetras_user", JSON.stringify(authenticatedUser));
       
       toast.success("Registration successful");
@@ -125,12 +136,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
     setIsLoggedIn(false);
+    setIsAdmin(false);
     localStorage.removeItem("quetras_user");
     toast.success("Logged out successfully");
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoggedIn, login, register, logout }}>
+    <AuthContext.Provider value={{ user, isLoggedIn, isAdmin, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
