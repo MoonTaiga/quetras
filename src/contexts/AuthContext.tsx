@@ -62,11 +62,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       // Create user object (excluding password)
-      const authenticatedUser = {
+      const authenticatedUser: User = {
         id: foundUser.id,
         name: foundUser.name,
         email: foundUser.email,
-        role: foundUser.role || "user" // Default to "user" if role is not set
+        role: foundUser.role as UserRole // Ensure role is cast to UserRole type
       };
       
       // Store in state and localStorage
@@ -104,7 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         name,
         email,
         password, // Note: In a real app, you would hash this password
-        role: "user" // Default role for new registrations
+        role: "user" as UserRole // Default role for new registrations
       };
       
       // Add to users array
@@ -112,7 +112,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem("quetras_users", JSON.stringify(existingUsers));
       
       // Log the user in automatically
-      const authenticatedUser = {
+      const authenticatedUser: User = {
         id: newUser.id,
         name: newUser.name,
         email: newUser.email,

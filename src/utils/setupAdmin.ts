@@ -19,7 +19,7 @@ export const setupAdminUser = () => {
       name: "Admin User",
       email: "admin@quetras.com",
       password: "admin123", // In a real app, this would be hashed
-      role: "admin"
+      role: "admin" as const // Use "as const" to ensure TypeScript knows this is specifically "admin"
     };
     
     existingUsers.push(adminUser);
