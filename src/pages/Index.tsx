@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/ui/container";
 import { StatCard } from "@/components/dashboard/StatCard";
@@ -7,17 +7,13 @@ import { QueryTable, QueryData } from "@/components/dashboard/QueryTable";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { 
-  AlertTriangle,
-  Bell,
   CalendarClock, 
   DollarSign, 
   FileText, 
   Plus, 
   Users 
 } from "lucide-react";
-import { notificationService } from "@/lib/notification-service";
-import { toast } from "sonner";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Mock data for demonstration
 const mockQueries: QueryData[] = [
@@ -55,22 +51,8 @@ const mockQueries: QueryData[] = [
   },
 ];
 
-const studentIds = ["ST001", "ST002", "ST003", "ST004"];
-
 const Index = () => {
-  const [showBulkNotification, setShowBulkNotification] = useState(false);
-
-  const sendBulkNotifications = () => {
-    notificationService.sendBulkNotifications(
-      studentIds,
-      "Payment Deadline Reminder",
-      "This is a reminder that your tuition payment deadline is approaching. Please ensure your payment is submitted on time."
-    );
-  };
-
-  const toggleBulkNotification = () => {
-    setShowBulkNotification(!showBulkNotification);
-  };
+  const { isAdmin } = useAuth();
 
   return (
     <main className="min-h-screen flex flex-col bg-background">
@@ -85,14 +67,11 @@ const Index = () => {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <Button 
-                variant="outline" 
-                onClick={toggleBulkNotification}
-                className="flex items-center gap-2"
-              >
-                <Bell className="h-4 w-4" />
-                Payment Reminders
-              </Button>
+              {!isAdmin && (
+                <Button variant="outline" asChild>
+                  <Link to="/online-payment">Online Payment</Link>
+                </Button>
+              )}
               <Button asChild>
                 <Link to="/query/new">
                   <Plus className="mr-2 h-4 w-4" />
@@ -101,26 +80,6 @@ const Index = () => {
               </Button>
             </div>
           </div>
-
-          {showBulkNotification && (
-            <Alert className="mb-6">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertTitle>Send payment reminders to students</AlertTitle>
-              <AlertDescription className="flex flex-col gap-2">
-                <p>
-                  This will send a notification to all students with upcoming payment deadlines.
-                </p>
-                <div className="flex gap-2 mt-1">
-                  <Button size="sm" onClick={sendBulkNotifications}>
-                    Send Reminders
-                  </Button>
-                  <Button size="sm" variant="outline" onClick={toggleBulkNotification}>
-                    Cancel
-                  </Button>
-                </div>
-              </AlertDescription>
-            </Alert>
-          )}
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             <StatCard
@@ -132,7 +91,7 @@ const Index = () => {
               trendValue="+12%"
             />
             <StatCard
-              title="Active Students"
+              title="Active Users"
               value="1,234"
               description="Across all programs"
               icon={Users}

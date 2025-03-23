@@ -1,5 +1,6 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/ui/container";
 import { QueryTable, QueryData } from "@/components/dashboard/QueryTable";
@@ -85,8 +86,18 @@ const mockQueries: QueryData[] = [
 ];
 
 const Queries = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialSearch = searchParams.get("search") || "";
+  
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [filterStatus, setFilterStatus] = useState<string>("all");
+
+  // Set search query from URL params on initial load
+  useEffect(() => {
+    if (initialSearch) {
+      setSearchQuery(initialSearch);
+    }
+  }, [initialSearch]);
 
   // Filter the queries based on search query and status filter
   const filteredQueries = mockQueries.filter((query) => {
@@ -99,6 +110,11 @@ const Queries = () => {
     
     return matchesSearch && matchesStatus;
   });
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSearchParams(searchQuery ? { search: searchQuery } : {});
+  };
 
   return (
     <main className="min-h-screen flex flex-col bg-background">
@@ -121,7 +137,7 @@ const Queries = () => {
           </div>
 
           <div className="glass rounded-xl p-6 mb-6">
-            <div className="flex flex-col md:flex-row gap-4">
+            <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -172,7 +188,8 @@ const Queries = () => {
                   </SelectItem>
                 </SelectContent>
               </Select>
-            </div>
+              <Button type="submit" className="md:w-auto">Search</Button>
+            </form>
           </div>
 
           <div className="glass rounded-xl p-1 overflow-hidden">
@@ -185,6 +202,7 @@ const Queries = () => {
               <Button onClick={() => {
                 setSearchQuery("");
                 setFilterStatus("all");
+                setSearchParams({});
               }}>
                 Clear Filters
               </Button>

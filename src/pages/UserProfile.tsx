@@ -19,16 +19,16 @@ import {
   FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { IdCard, BellRing } from "lucide-react";
+import { IdCard, BellRing, ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const profileSchema = z.object({
   fullName: z.string().min(2, { message: "Name must be at least 2 characters" }),
   email: z.string().email({ message: "Please enter a valid email address" }),
   mobileNumber: z.string().min(10, { message: "Please enter a valid mobile number" }),
   schoolId: z.string().min(5, { message: "School ID must be at least 5 characters" }),
-  notificationsEnabled: z.boolean().default(true),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -44,7 +44,6 @@ const UserProfile = () => {
       email: user?.email || "",
       mobileNumber: "",
       schoolId: "",
-      notificationsEnabled: true,
     },
   });
 
@@ -57,7 +56,7 @@ const UserProfile = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast.success("Profile updated successfully", {
-        description: "You'll receive notifications if you're in the top 10 queries."
+        description: "You'll receive automatic notifications if you're in the top 10 queries."
       });
     } catch (error) {
       console.error("Profile update error:", error);
@@ -76,6 +75,17 @@ const UserProfile = () => {
       <Header />
       <div className="flex-1 page-container animate-fade-in">
         <Container as="section" className="py-8 max-w-2xl mx-auto" withGlass={false}>
+          <Button
+            variant="ghost"
+            className="mb-4 -ml-3"
+            asChild
+          >
+            <Link to="/dashboard">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Dashboard
+            </Link>
+          </Button>
+          
           <Card>
             <CardHeader className="space-y-1">
               <div className="flex justify-center mb-2">
@@ -83,7 +93,7 @@ const UserProfile = () => {
               </div>
               <CardTitle className="text-2xl font-bold text-center">User Profile</CardTitle>
               <CardDescription className="text-center">
-                Update your information to receive notifications about your queries
+                Update your information to receive automatic notifications about your queries
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-4">
@@ -91,7 +101,7 @@ const UserProfile = () => {
                 <AlertDescription className="flex items-start gap-2">
                   <BellRing className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                   <span>
-                    Students in the top 10 of the query list will receive notifications about their query status. Make sure your contact information is up-to-date.
+                    Students in the top 10 of the query list will automatically receive notifications about their query status. Make sure your contact information is up-to-date.
                   </span>
                 </AlertDescription>
               </Alert>
@@ -171,6 +181,13 @@ const UserProfile = () => {
                 </form>
               </Form>
             </CardContent>
+            <CardFooter className="flex justify-center border-t pt-6">
+              <Button variant="outline" asChild>
+                <Link to="/online-payment">
+                  Make Online Payment
+                </Link>
+              </Button>
+            </CardFooter>
           </Card>
         </Container>
       </div>

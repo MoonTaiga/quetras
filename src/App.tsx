@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Queries from "./pages/Queries";
 import QueryView from "./pages/QueryView";
 import NewQuery from "./pages/NewQuery";
+import OnlinePayment from "./pages/OnlinePayment";
 import UserProfile from "./pages/UserProfile";
 import Login from "./pages/Login";
 import AdminLogin from "./pages/AdminLogin";
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/queries" element={<Queries />} />
             <Route path="/query/:id" element={<QueryView />} />
             <Route path="/query/new" element={<NewQuery />} />
+            <Route path="/online-payment" element={<OnlinePayment />} />
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/login" element={<Login />} />
             <Route path="/admin-login" element={<AdminLogin />} />

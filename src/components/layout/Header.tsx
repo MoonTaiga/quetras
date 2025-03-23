@@ -1,19 +1,38 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { Home, Menu, Search, LogIn, User, LogOut, Shield } from "lucide-react";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 import { useAuth } from "@/contexts/AuthContext";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 export const Header = () => {
   const { isLoggedIn, isAdmin, user, logout } = useAuth();
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate("/");
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/queries?search=${encodeURIComponent(searchQuery)}`);
+      setIsSearchOpen(false);
+      setSearchQuery("");
+    }
   };
 
   return (
@@ -42,8 +61,8 @@ export const Header = () => {
           )}
           {isLoggedIn && !isAdmin && (
             <>
-              <Link to="#">Students</Link>
-              <Link to="#">Reports</Link>
+              <Link to="/query/new">New Query</Link>
+              <Link to="/online-payment">Online Payment</Link>
             </>
           )}
         </div>
@@ -52,9 +71,27 @@ export const Header = () => {
           {isLoggedIn ? (
             <>
               <NotificationCenter />
-              <Button size="icon" variant="ghost">
-                <Search className="h-4 w-4" />
-              </Button>
+              <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+                <DialogTrigger asChild>
+                  <Button size="icon" variant="ghost">
+                    <Search className="h-4 w-4" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Search Queries</DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={handleSearch} className="flex gap-2 mt-2">
+                    <Input
+                      placeholder="Search by ID, query title..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="flex-1"
+                    />
+                    <Button type="submit">Search</Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
               <div className="hidden md:flex items-center gap-1 mr-2 text-sm">
                 Welcome, <span className="font-medium">{user?.name}</span>
                 {isAdmin && (
@@ -63,6 +100,14 @@ export const Header = () => {
                   </span>
                 )}
               </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => navigate("/profile")}
+                className="hidden md:flex mr-2"
+              >
+                Profile
+              </Button>
               <Button variant="outline" size="sm" onClick={handleLogout} className="hidden md:flex">
                 <LogOut className="h-4 w-4 mr-2" /> Logout
               </Button>

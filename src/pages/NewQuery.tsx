@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -26,7 +25,6 @@ const NewQuery = () => {
   // Form state
   const [queryTitle, setQueryTitle] = useState("");
   const [amount, setAmount] = useState("");
-  const [description, setDescription] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +35,7 @@ const NewQuery = () => {
       return;
     }
 
-    if (!queryTitle || !amount || !description) {
+    if (!queryTitle || !amount) {
       toast.error("Please fill in all fields");
       return;
     }
@@ -123,20 +121,6 @@ const NewQuery = () => {
                     <p className="text-xs text-muted-foreground mt-1">
                       Enter the amount related to your query
                     </p>
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="description" className="block text-sm font-medium mb-1">
-                      Description
-                    </label>
-                    <Textarea
-                      id="description"
-                      placeholder="Please provide details about your query..."
-                      rows={5}
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      required
-                    />
                   </div>
                 </div>
                 
