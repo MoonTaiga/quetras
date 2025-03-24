@@ -21,12 +21,56 @@ export const useQueryFilters = (initialQueries: QueryData[] = []) => {
     const storedQueries = localStorage.getItem("quetras_queries");
     if (storedQueries) {
       try {
-        setQueries(JSON.parse(storedQueries));
+        const parsedQueries = JSON.parse(storedQueries);
+        
+        // Sort queries - move cancelled to the end, new ones to the front
+        const sortedQueries = parsedQueries.sort((a: QueryData, b: QueryData) => {
+          // If a is cancelled but b isn't, a goes after b
+          if (a.status === "cancelled" && b.status !== "cancelled") return 1;
+          // If b is cancelled but a isn't, a goes before b
+          if (b.status === "cancelled" && a.status !== "cancelled") return -1;
+          // If both are cancelled or neither are, sort by date (newest first)
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
+        });
+        
+        setQueries(sortedQueries);
       } catch (error) {
         console.error("Failed to parse stored queries:", error);
       }
     }
   }, [initialSearch]);
+
+  // Listen for changes in localStorage
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const storedQueries = localStorage.getItem("quetras_queries");
+      if (storedQueries) {
+        try {
+          const parsedQueries = JSON.parse(storedQueries);
+          
+          // Sort queries - move cancelled to the end, new ones to the front
+          const sortedQueries = parsedQueries.sort((a: QueryData, b: QueryData) => {
+            // If a is cancelled but b isn't, a goes after b
+            if (a.status === "cancelled" && b.status !== "cancelled") return 1;
+            // If b is cancelled but a isn't, a goes before b
+            if (b.status === "cancelled" && a.status !== "cancelled") return -1;
+            // If both are cancelled or neither are, sort by date (newest first)
+            return new Date(b.date).getTime() - new Date(a.date).getTime();
+          });
+          
+          setQueries(sortedQueries);
+        } catch (error) {
+          console.error("Failed to parse stored queries:", error);
+        }
+      }
+    };
+    
+    window.addEventListener("storage", handleStorageChange);
+    
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
 
   // Filter the queries based on search query and status filter
   const filteredQueries = queries.filter((query) => {

@@ -44,7 +44,12 @@ const QueryTable = ({ queries, className }: QueryTableProps) => {
         </TableHeader>
         <TableBody>
           {queries.map((query) => (
-            <TableRow key={query.id} className="transition-colors hover:bg-muted/30">
+            <TableRow 
+              key={query.id} 
+              className={`transition-colors hover:bg-muted/30 ${
+                query.status === "cancelled" ? "opacity-60" : ""
+              }`}
+            >
               <TableCell className="font-medium">{query.id}</TableCell>
               <TableCell>{query.studentName}</TableCell>
               <TableCell>{query.queryTitle}</TableCell>
@@ -60,7 +65,7 @@ const QueryTable = ({ queries, className }: QueryTableProps) => {
                   asChild
                   variant="ghost"
                   size="icon"
-                  className="rounded-full h-8 w-8"
+                  className="rounded-full h-8 w-8 transition-transform hover:scale-110 hover:bg-muted"
                 >
                   <Link to={`/query/${query.id}`}>
                     <ArrowRight className="h-4 w-4" />

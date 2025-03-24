@@ -9,6 +9,7 @@ import { Calendar, Clock, DollarSign, User, Bell, X, Plus } from "lucide-react";
 import { notificationService } from "@/lib/notification-service";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export interface QueryDetailData {
   id: string;
@@ -49,15 +50,43 @@ const QueryDetail = ({ query, className }: QueryDetailProps) => {
 
   // Function to cancel a query (for users)
   const cancelQuery = () => {
-    // In a real app, this would make an API call to update the query status
-    alert("Query cancelled. In a real application, this would update the database.");
+    // Get all queries from localStorage
+    const storedQueries = localStorage.getItem("quetras_queries");
+    if (storedQueries) {
+      try {
+        const queries = JSON.parse(storedQueries);
+        
+        // Find the index of the current query
+        const queryIndex = queries.findIndex((q: any) => q.id === query.id);
+        
+        if (queryIndex !== -1) {
+          // Update the status to cancelled
+          queries[queryIndex].status = "cancelled";
+          
+          // Reorder queries - move cancelled query to the end
+          const cancelledQuery = queries.splice(queryIndex, 1)[0];
+          queries.push(cancelledQuery);
+          
+          // Save updated queries back to localStorage
+          localStorage.setItem("quetras_queries", JSON.stringify(queries));
+          
+          toast.success("Query cancelled successfully");
+          
+          // Redirect to queries list
+          navigate("/queries");
+        }
+      } catch (error) {
+        console.error("Failed to update queries:", error);
+        toast.error("Failed to cancel query");
+      }
+    }
   };
 
   // Function to add a note (for admins)
   const addNote = () => {
     if (note.trim()) {
       // In a real app, this would make an API call to add the note to the query
-      alert(`Note added: "${note}". In a real application, this would update the database.`);
+      toast.success("Note added successfully");
       setShowNoteForm(false);
       setNote("");
     }
@@ -70,8 +99,8 @@ const QueryDetail = ({ query, className }: QueryDetailProps) => {
 
   return (
     <div className={cn("space-y-6", className)}>
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-accent/50">
+      <Card className="overflow-hidden transition-all hover:shadow-soft dark:border-border">
+        <CardHeader className="bg-accent/50 dark:bg-accent/20">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <div className="text-sm text-muted-foreground">Query #{query.id}</div>
@@ -168,33 +197,41 @@ const QueryDetail = ({ query, className }: QueryDetailProps) => {
             {isAdmin ? (
               // Admin-only actions
               <>
-                <Button>Update Status</Button>
+                <Button 
+                  className="transition-all hover:scale-105"
+                >
+                  Update Status
+                </Button>
                 <Button 
                   variant="outline" 
                   onClick={() => setShowNoteForm(true)}
+                  className="transition-all hover:shadow-soft"
                 >
                   Add Note
                 </Button>
                 <Button 
                   variant="outline"
                   onClick={sendNotification}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 transition-all hover:shadow-soft"
                 >
                   <Bell className="h-4 w-4" />
                   Notify Student
                 </Button>
               </>
             ) : (
-              // User-only actions
+              // User-only actions - limited to add/cancel
               <>
-                <Button onClick={handleAddQuery} className="flex items-center gap-2">
+                <Button 
+                  onClick={handleAddQuery} 
+                  className="flex items-center gap-2 transition-all hover:scale-105"
+                >
                   <Plus className="h-4 w-4" />
                   Add Query
                 </Button>
                 <Button 
                   variant="outline"
                   onClick={cancelQuery}
-                  className="flex items-center gap-2 text-destructive"
+                  className="flex items-center gap-2 text-destructive hover:bg-destructive/10 transition-all"
                 >
                   <X className="h-4 w-4" />
                   Cancel Query
@@ -206,15 +243,15 @@ const QueryDetail = ({ query, className }: QueryDetailProps) => {
       </Card>
 
       {query.timeline && (
-        <Card>
+        <Card className="transition-all hover:shadow-soft dark:border-border">
           <CardHeader>
             <CardTitle className="text-xl">Query Timeline</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="relative ml-3 space-y-4 pl-6 pt-2 before:absolute before:left-0 before:top-2 before:h-full before:w-px before:bg-border">
               {query.timeline.map((item, i) => (
-                <div key={i} className="relative">
-                  <div className="absolute -left-[27px] top-[5px] h-4 w-4 rounded-full border-2 border-background bg-border" />
+                <div key={i} className="relative group">
+                  <div className="absolute -left-[27px] top-[5px] h-4 w-4 rounded-full border-2 border-background bg-border group-hover:scale-110 transition-transform" />
                   <div className="text-sm font-medium">{item.title}</div>
                   <div className="text-xs text-muted-foreground">{item.date}</div>
                   <div className="mt-1 text-sm">{item.description}</div>

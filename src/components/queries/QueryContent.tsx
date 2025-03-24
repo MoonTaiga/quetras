@@ -25,7 +25,7 @@ export const QueryContent: React.FC<QueryContentProps> = ({
   onClearFilters
 }) => {
   return (
-    <Container as="section" className="py-8" withGlass={false}>
+    <Container as="section" className="py-8 animate-fade-in" withGlass={false}>
       <QuerySearch 
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -34,7 +34,7 @@ export const QueryContent: React.FC<QueryContentProps> = ({
         onSearch={onSearch}
       />
 
-      <div className="glass rounded-xl p-1 overflow-hidden">
+      <div className="glass rounded-xl p-1 overflow-hidden transition-all hover:shadow-soft">
         <QueryTable queries={filteredQueries} />
       </div>
       
