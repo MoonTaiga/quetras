@@ -1,5 +1,6 @@
 
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/ui/container";
 import { StatCard } from "@/components/dashboard/StatCard";
@@ -14,45 +15,40 @@ import {
   Users 
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-
-// Mock data for demonstration
-const mockQueries: QueryData[] = [
-  {
-    id: "TQ-1234",
-    studentName: "Emma Thompson",
-    queryTitle: "Scholarship Application",
-    amount: 1500.00,
-    date: "2023-09-15",
-    status: "completed",
-  },
-  {
-    id: "TQ-1235",
-    studentName: "Michael Johnson",
-    queryTitle: "Late Payment Fee",
-    amount: 250.00,
-    date: "2023-09-18",
-    status: "processing",
-  },
-  {
-    id: "TQ-1236",
-    studentName: "Sarah Williams",
-    queryTitle: "Payment Plan Request",
-    amount: 3200.00,
-    date: "2023-09-20",
-    status: "pending",
-  },
-  {
-    id: "TQ-1237",
-    studentName: "James Wilson",
-    queryTitle: "Refund Request",
-    amount: 750.00,
-    date: "2023-09-22",
-    status: "new",
-  },
-];
+import { Footer } from "@/components/layout/Footer";
 
 const Index = () => {
-  const { isAdmin } = useAuth();
+  const { isAdmin, isLoggedIn } = useAuth();
+  const navigate = useNavigate();
+  const [queries, setQueries] = React.useState<QueryData[]>([]);
+
+  React.useEffect(() => {
+    // Get queries from localStorage if available
+    const storedQueries = localStorage.getItem("quetras_queries");
+    if (storedQueries) {
+      try {
+        setQueries(JSON.parse(storedQueries));
+      } catch (error) {
+        console.error("Failed to parse stored queries:", error);
+      }
+    }
+  }, []);
+
+  const handleNewQuery = () => {
+    if (!isLoggedIn) {
+      navigate("/login");
+    } else {
+      navigate("/query/new");
+    }
+  };
+
+  const handleOnlinePayment = () => {
+    if (!isLoggedIn) {
+      navigate("/login");
+    } else {
+      navigate("/online-payment");
+    }
+  };
 
   return (
     <main className="min-h-screen flex flex-col bg-background">
@@ -68,15 +64,13 @@ const Index = () => {
             </div>
             <div className="flex items-center gap-2">
               {!isAdmin && (
-                <Button variant="outline" asChild>
-                  <Link to="/online-payment">Online Payment</Link>
+                <Button variant="outline" onClick={handleOnlinePayment}>
+                  Online Payment
                 </Button>
               )}
-              <Button asChild>
-                <Link to="/query/new">
-                  <Plus className="mr-2 h-4 w-4" />
-                  New Query
-                </Link>
+              <Button onClick={handleNewQuery}>
+                <Plus className="mr-2 h-4 w-4" />
+                New Query
               </Button>
             </div>
           </div>
@@ -84,35 +78,35 @@ const Index = () => {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             <StatCard
               title="Total Queries"
-              value="257"
-              description="This month"
+              value={queries.length.toString()}
+              description="All queries"
               icon={FileText}
-              trend="up"
-              trendValue="+12%"
+              trend="neutral"
+              trendValue=""
             />
             <StatCard
               title="Active Users"
-              value="1,234"
-              description="Across all programs"
+              value={isAdmin ? "Admin" : "User"}
+              description="Current session"
               icon={Users}
               trend="neutral"
-              trendValue="+2%"
+              trendValue=""
             />
             <StatCard
               title="Processing Time"
               value="1.5 days"
               description="Average resolution time"
               icon={CalendarClock}
-              trend="down"
-              trendValue="-8%"
+              trend="neutral"
+              trendValue=""
             />
             <StatCard
               title="Total Amount"
-              value="$157,290"
-              description="Current semester"
+              value={`$${queries.reduce((sum, query) => sum + (query.amount || 0), 0).toFixed(2)}`}
+              description="All queries"
               icon={DollarSign}
-              trend="up"
-              trendValue="+15%"
+              trend="neutral"
+              trendValue=""
             />
           </div>
 
@@ -124,11 +118,12 @@ const Index = () => {
               </Button>
             </div>
             <div className="glass rounded-xl p-1 overflow-hidden">
-              <QueryTable queries={mockQueries} />
+              <QueryTable queries={queries.slice(0, 5)} />
             </div>
           </div>
         </Container>
       </div>
+      <Footer />
     </main>
   );
 };

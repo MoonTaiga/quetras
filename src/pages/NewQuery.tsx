@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/ui/container";
@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Footer } from "@/components/layout/Footer";
 import {
   Card,
   CardContent,
@@ -26,6 +27,13 @@ const NewQuery = () => {
   const [queryTitle, setQueryTitle] = useState("");
   const [amount, setAmount] = useState("");
 
+  useEffect(() => {
+    // Redirect to login if not logged in
+    if (!isLoggedIn) {
+      navigate("/login");
+    }
+  }, [isLoggedIn, navigate]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -42,28 +50,49 @@ const NewQuery = () => {
 
     setIsSubmitting(true);
 
-    // In a real app, this would make an API call to save the query
-    // For demo purposes, we'll simulate a successful submission
+    // Generate a new query ID
+    const newQueryId = `TQ-${Math.floor(1000 + Math.random() * 9000)}`;
+    
+    // Create new query object
+    const newQuery = {
+      id: newQueryId,
+      studentName: user?.name || "Anonymous",
+      queryTitle: queryTitle,
+      amount: parseFloat(amount),
+      date: new Date().toISOString().split('T')[0],
+      status: "new",
+    };
+    
+    // Get existing queries from localStorage
+    const existingQueries = JSON.parse(localStorage.getItem("quetras_queries") || "[]");
+    
+    // Add new query to existing queries
+    const updatedQueries = [newQuery, ...existingQueries];
+    
+    // Save to localStorage
+    localStorage.setItem("quetras_queries", JSON.stringify(updatedQueries));
+    
     setTimeout(() => {
       setIsSubmitting(false);
-      
-      // Generate a new query ID (would come from the server in a real app)
-      const newQueryId = `TQ-${Math.floor(1000 + Math.random() * 9000)}`;
       
       toast.success("Query submitted successfully", {
         description: `Your query ID is ${newQueryId}`,
       });
       
+      // Check if this query is in top 10
+      if (updatedQueries.length <= 10) {
+        // Send notification email (in a real app)
+        toast.success("You are in the top 10 queries!", {
+          description: "You will receive notifications about your query status.",
+        });
+      }
+      
       // Redirect to the queries list
       navigate("/queries");
-    }, 1500);
+    }, 1000);
   };
 
-  // Redirect to login if not logged in
-  if (!isLoggedIn) {
-    navigate("/login");
-    return null;
-  }
+  // If not logged in, component will redirect in useEffect
 
   return (
     <main className="min-h-screen flex flex-col bg-background">
@@ -126,7 +155,7 @@ const NewQuery = () => {
                 
                 <Button 
                   type="submit" 
-                  className="w-full"
+                  className="w-full bg-sky-600 hover:bg-sky-700"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? "Submitting..." : "Submit Query"}
@@ -136,6 +165,7 @@ const NewQuery = () => {
           </Card>
         </Container>
       </div>
+      <Footer />
     </main>
   );
 };

@@ -21,6 +21,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/contexts/AuthContext";
 import { User, ArrowLeft } from "lucide-react";
+import { Footer } from "@/components/layout/Footer";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -58,87 +59,90 @@ const Login = () => {
   };
 
   return (
-    <Container className="flex items-center justify-center min-h-screen">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <div className="flex justify-between items-center mb-2">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => navigate("/")}
-              className="text-muted-foreground"
-              aria-label="Back to home"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <User className="h-10 w-10 text-primary mx-auto" />
-            <div className="w-10"></div> {/* Spacer for alignment */}
-          </div>
-          <CardTitle className="text-2xl font-bold text-center">User Login</CardTitle>
-          <CardDescription className="text-center">
-            Enter your credentials to access your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Alert className="mb-4 bg-muted">
-            <AlertDescription>
-              This is a demo application. Register first to create an account, then use those credentials to log in.
-              <div className="mt-2">
-                For admin access, use the <Link to="/admin-login" className="text-primary hover:underline">Admin Login</Link> page.
-              </div>
-            </AlertDescription>
-          </Alert>
-          
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="you@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="••••••" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? "Logging in..." : "Login"}
+    <main className="min-h-screen flex flex-col bg-background">
+      <Container className="flex items-center justify-center flex-1 py-10">
+        <Card className="w-full max-w-md">
+          <CardHeader className="space-y-1">
+            <div className="flex justify-between items-center mb-2">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => navigate("/")}
+                className="text-muted-foreground"
+                aria-label="Back to home"
+              >
+                <ArrowLeft className="h-5 w-5" />
               </Button>
-            </form>
-          </Form>
-        </CardContent>
-        <CardFooter className="flex flex-col space-y-2">
-          <div className="text-center text-sm text-muted-foreground">
-            Don't have an account?{" "}
-            <Link to="/register" className="text-primary hover:underline">
-              Register
-            </Link>
-          </div>
-          <div className="text-center text-sm text-muted-foreground">
-            Need admin access?{" "}
-            <Link to="/admin-login" className="text-primary hover:underline">
-              Admin Login
-            </Link>
-          </div>
-        </CardFooter>
-      </Card>
-    </Container>
+              <User className="h-10 w-10 text-sky-600 mx-auto" />
+              <div className="w-10"></div> {/* Spacer for alignment */}
+            </div>
+            <CardTitle className="text-2xl font-bold text-center">User Login</CardTitle>
+            <CardDescription className="text-center">
+              Enter your credentials to access your account
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Alert className="mb-4 bg-muted">
+              <AlertDescription>
+                This is a demo application. Register first to create an account, then use those credentials to log in.
+                <div className="mt-2">
+                  For admin access, use the <Link to="/admin-login" className="text-sky-600 hover:underline">Admin Login</Link> page.
+                </div>
+              </AlertDescription>
+            </Alert>
+            
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="you@example.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="••••••" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" className="w-full bg-sky-600 hover:bg-sky-700" disabled={form.formState.isSubmitting}>
+                  {form.formState.isSubmitting ? "Logging in..." : "Login"}
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+          <CardFooter className="flex flex-col space-y-2">
+            <div className="text-center text-sm text-muted-foreground">
+              Don't have an account?{" "}
+              <Link to="/register" className="text-sky-600 hover:underline">
+                Register
+              </Link>
+            </div>
+            <div className="text-center text-sm text-muted-foreground">
+              Need admin access?{" "}
+              <Link to="/admin-login" className="text-sky-600 hover:underline">
+                Admin Login
+              </Link>
+            </div>
+          </CardFooter>
+        </Card>
+      </Container>
+      <Footer />
+    </main>
   );
 };
 

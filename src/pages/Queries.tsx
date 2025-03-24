@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/ui/container";
 import { QueryTable, QueryData } from "@/components/dashboard/QueryTable";
@@ -16,91 +16,41 @@ import {
 } from "@/components/ui/select";
 import { Link } from "react-router-dom";
 import { Plus, Search } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Footer } from "@/components/layout/Footer";
 
-// Extended mock data for demonstration
-const mockQueries: QueryData[] = [
-  {
-    id: "TQ-1234",
-    studentName: "Emma Thompson",
-    queryTitle: "Scholarship Application",
-    amount: 1500.00,
-    date: "2023-09-15",
-    status: "completed",
-  },
-  {
-    id: "TQ-1235",
-    studentName: "Michael Johnson",
-    queryTitle: "Late Payment Fee",
-    amount: 250.00,
-    date: "2023-09-18",
-    status: "processing",
-  },
-  {
-    id: "TQ-1236",
-    studentName: "Sarah Williams",
-    queryTitle: "Payment Plan Request",
-    amount: 3200.00,
-    date: "2023-09-20",
-    status: "pending",
-  },
-  {
-    id: "TQ-1237",
-    studentName: "James Wilson",
-    queryTitle: "Refund Request",
-    amount: 750.00,
-    date: "2023-09-22",
-    status: "new",
-  },
-  {
-    id: "TQ-1238",
-    studentName: "David Brown",
-    queryTitle: "Tuition Discount Inquiry",
-    amount: 1200.00,
-    date: "2023-09-23",
-    status: "pending",
-  },
-  {
-    id: "TQ-1239",
-    studentName: "Lisa Miller",
-    queryTitle: "Financial Aid Question",
-    amount: 950.00,
-    date: "2023-09-24",
-    status: "new",
-  },
-  {
-    id: "TQ-1240",
-    studentName: "Robert Davis",
-    queryTitle: "International Student Fee",
-    amount: 3500.00,
-    date: "2023-09-25",
-    status: "completed",
-  },
-  {
-    id: "TQ-1241",
-    studentName: "Jennifer Garcia",
-    queryTitle: "Payment Confirmation",
-    amount: 2100.00,
-    date: "2023-09-26",
-    status: "cancelled",
-  },
-];
+// Empty initial queries array - user will add their own
+const initialQueries: QueryData[] = [];
 
 const Queries = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialSearch = searchParams.get("search") || "";
+  const navigate = useNavigate();
+  const { isLoggedIn } = useAuth();
   
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [queries, setQueries] = useState<QueryData[]>(initialQueries);
 
   // Set search query from URL params on initial load
   useEffect(() => {
     if (initialSearch) {
       setSearchQuery(initialSearch);
     }
+    
+    // Get queries from localStorage if available
+    const storedQueries = localStorage.getItem("quetras_queries");
+    if (storedQueries) {
+      try {
+        setQueries(JSON.parse(storedQueries));
+      } catch (error) {
+        console.error("Failed to parse stored queries:", error);
+      }
+    }
   }, [initialSearch]);
 
   // Filter the queries based on search query and status filter
-  const filteredQueries = mockQueries.filter((query) => {
+  const filteredQueries = queries.filter((query) => {
     const matchesSearch =
       query.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       query.queryTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -116,6 +66,14 @@ const Queries = () => {
     setSearchParams(searchQuery ? { search: searchQuery } : {});
   };
 
+  const handleNewQuery = () => {
+    if (!isLoggedIn) {
+      navigate("/login");
+    } else {
+      navigate("/query/new");
+    }
+  };
+
   return (
     <main className="min-h-screen flex flex-col bg-background">
       <Header />
@@ -128,11 +86,9 @@ const Queries = () => {
                 View and manage all tuition payment queries
               </p>
             </div>
-            <Button asChild>
-              <Link to="/query/new">
-                <Plus className="mr-2 h-4 w-4" />
-                New Query
-              </Link>
+            <Button onClick={handleNewQuery}>
+              <Plus className="mr-2 h-4 w-4" />
+              New Query
             </Button>
           </div>
 
@@ -210,6 +166,7 @@ const Queries = () => {
           )}
         </Container>
       </div>
+      <Footer />
     </main>
   );
 };

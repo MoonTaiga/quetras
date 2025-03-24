@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/ui/container";
@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Footer } from "@/components/layout/Footer";
 import {
   Card,
   CardContent,
@@ -35,18 +36,20 @@ const OnlinePayment = () => {
   const [name, setName] = useState(user?.name || "");
   const [email, setEmail] = useState(user?.email || "");
   const [amount, setAmount] = useState("");
+  const [queryTitle, setQueryTitle] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
+
+  useEffect(() => {
+    // Redirect to login if not logged in
+    if (!isLoggedIn) {
+      navigate("/login");
+    }
+  }, [isLoggedIn, navigate]);
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!isLoggedIn) {
-      toast.error("You must be logged in to make a payment");
-      navigate("/login");
-      return;
-    }
-
-    if (!name || !email || !amount || !paymentMethod) {
+    if (!name || !email || !amount || !paymentMethod || !queryTitle) {
       toast.error("Please fill in all fields");
       return;
     }
@@ -61,16 +64,32 @@ const OnlinePayment = () => {
         description: `Your payment of $${amount} has been received.`,
       });
       
+      // Create query from payment
+      const newQueryId = `TQ-${Math.floor(1000 + Math.random() * 9000)}`;
+      
+      // Create new query object
+      const newQuery = {
+        id: newQueryId,
+        studentName: name,
+        queryTitle: queryTitle,
+        amount: parseFloat(amount),
+        date: new Date().toISOString().split('T')[0],
+        status: "completed",
+      };
+      
+      // Get existing queries from localStorage
+      const existingQueries = JSON.parse(localStorage.getItem("quetras_queries") || "[]");
+      
+      // Add new query to existing queries
+      const updatedQueries = [newQuery, ...existingQueries];
+      
+      // Save to localStorage
+      localStorage.setItem("quetras_queries", JSON.stringify(updatedQueries));
+      
       // Redirect to the queries list
       navigate("/queries");
     }, 2000);
   };
-
-  // Redirect to login if not logged in
-  if (!isLoggedIn) {
-    navigate("/login");
-    return null;
-  }
 
   return (
     <main className="min-h-screen flex flex-col bg-background">
@@ -121,6 +140,19 @@ const OnlinePayment = () => {
                       placeholder="Enter your email address"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="queryTitle" className="block text-sm font-medium mb-1">
+                      Payment For
+                    </label>
+                    <Input
+                      id="queryTitle"
+                      placeholder="e.g., Tuition Fee, Examination Fee"
+                      value={queryTitle}
+                      onChange={(e) => setQueryTitle(e.target.value)}
                       required
                     />
                   </div>
@@ -180,7 +212,7 @@ const OnlinePayment = () => {
             <CardFooter>
               <Button 
                 onClick={handleSubmit}
-                className="w-full"
+                className="w-full bg-sky-600 hover:bg-sky-700"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Processing..." : "Make Payment"}
@@ -189,6 +221,7 @@ const OnlinePayment = () => {
           </Card>
         </Container>
       </div>
+      <Footer />
     </main>
   );
 };
