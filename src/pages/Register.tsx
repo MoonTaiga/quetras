@@ -19,8 +19,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
-import { Footer } from "@/components/layout/Footer";
 import { ArrowLeft, User } from "lucide-react";
+import { Logo } from "@/components/layout/Logo";
 
 const registerSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -51,29 +51,31 @@ const Register = () => {
   const onSubmit = async (data: RegisterFormValues) => {
     const success = await register(data.name, data.email, data.password);
     if (success) {
-      navigate("/dashboard");
+      navigate("/login");
     }
   };
 
   return (
     <main className="min-h-screen flex flex-col bg-background">
       <Container className="flex items-center justify-center flex-1 py-10">
-        <Card className="w-full max-w-md">
+        <Card className="w-full max-w-md transition-all hover:shadow-lg">
           <CardHeader className="space-y-1">
             <div className="flex justify-between items-center mb-2">
               <Button 
                 variant="ghost" 
                 size="icon" 
                 onClick={() => navigate("/")}
-                className="text-muted-foreground"
+                className="text-muted-foreground transition-all hover:text-sky-600 hover:bg-sky-50"
                 aria-label="Back to home"
               >
                 <ArrowLeft className="h-5 w-5" />
               </Button>
-              <User className="h-10 w-10 text-sky-600 mx-auto" />
+              <div className="flex items-center">
+                <Logo className="h-10 w-10 text-sky-600" />
+              </div>
               <div className="w-10"></div> {/* Spacer for alignment */}
             </div>
-            <CardTitle className="text-2xl font-bold text-center">Create an account</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center text-sky-800">Create an account</CardTitle>
             <CardDescription className="text-center">
               Enter your information to create an account
             </CardDescription>
@@ -88,7 +90,7 @@ const Register = () => {
                     <FormItem>
                       <FormLabel>Full Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="John Doe" {...field} />
+                        <Input placeholder="John Doe" {...field} className="transition-all focus:border-sky-300 hover:border-sky-200" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -101,7 +103,7 @@ const Register = () => {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="you@example.com" {...field} />
+                        <Input placeholder="you@example.com" {...field} className="transition-all focus:border-sky-300 hover:border-sky-200" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -114,7 +116,7 @@ const Register = () => {
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="••••••" {...field} />
+                        <Input type="password" placeholder="••••••" {...field} className="transition-all focus:border-sky-300 hover:border-sky-200" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -127,13 +129,17 @@ const Register = () => {
                     <FormItem>
                       <FormLabel>Confirm Password</FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="••••••" {...field} />
+                        <Input type="password" placeholder="••••••" {...field} className="transition-all focus:border-sky-300 hover:border-sky-200" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full bg-sky-600 hover:bg-sky-700" disabled={form.formState.isSubmitting}>
+                <Button 
+                  type="submit" 
+                  className="w-full bg-sky-600 hover:bg-sky-700 transition-all hover:scale-[1.01]" 
+                  disabled={form.formState.isSubmitting}
+                >
                   {form.formState.isSubmitting ? "Creating account..." : "Register"}
                 </Button>
               </form>
@@ -142,14 +148,13 @@ const Register = () => {
           <CardFooter className="flex flex-col space-y-2">
             <div className="text-center text-sm text-muted-foreground">
               Already have an account?{" "}
-              <Link to="/login" className="text-sky-600 hover:underline">
+              <Link to="/login" className="text-sky-600 hover:underline transition-all hover:text-sky-700">
                 Login
               </Link>
             </div>
           </CardFooter>
         </Card>
       </Container>
-      <Footer />
     </main>
   );
 };

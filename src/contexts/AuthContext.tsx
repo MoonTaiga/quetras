@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 type UserRole = "admin" | "user";
 
@@ -9,7 +10,6 @@ type User = {
   name: string;
   email: string;
   role: UserRole;
-  verified: boolean;
 };
 
 type AuthContextType = {
@@ -44,47 +44,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  // Simulate sending verification email
-  const sendVerificationEmail = async (email: string, name: string) => {
-    console.log(`Sending verification email to ${email} for ${name}`);
-    
-    // In a real app, this would call an API to send an email
-    // For demo purposes, we'll just show a toast
-    
-    toast.success("Verification email sent", {
-      description: `A verification email has been sent to ${email}. Please check your inbox.`,
-    });
-    
-    // Simulate automatic verification after 3 seconds
-    setTimeout(() => {
-      // Get existing users
-      const users = JSON.parse(localStorage.getItem("quetras_users") || "[]");
-      
-      // Find and update the user
-      const updatedUsers = users.map((u: any) => {
-        if (u.email === email) {
-          return { ...u, verified: true };
-        }
-        return u;
-      });
-      
-      // Update localStorage
-      localStorage.setItem("quetras_users", JSON.stringify(updatedUsers));
-      
-      // If the current user is this user, update them too
-      if (user && user.email === email) {
-        const updatedUser = { ...user, verified: true };
-        setUser(updatedUser);
-        localStorage.setItem("quetras_user", JSON.stringify(updatedUser));
-        
-        // Show verification success toast
-        toast.success("Email verified successfully", {
-          description: "Your account has been verified.",
-        });
-      }
-    }, 3000);
-  };
-
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       // In a real app, this would make an API call to authenticate
@@ -109,7 +68,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         name: foundUser.name,
         email: foundUser.email,
         role: foundUser.role as UserRole,
-        verified: foundUser.verified || false
       };
       
       // Store in state and localStorage
@@ -119,11 +77,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem("quetras_user", JSON.stringify(authenticatedUser));
       
       toast.success(`Login successful as ${authenticatedUser.role}`);
-      
-      // If not verified, send verification email
-      if (!authenticatedUser.verified) {
-        sendVerificationEmail(authenticatedUser.email, authenticatedUser.name);
-      }
       
       return true;
     } catch (error) {
@@ -147,38 +100,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return false;
       }
       
+      // Generate a user ID (simulating auto-assignment)
+      const userId = `STU${Math.floor(10000 + Math.random() * 90000)}`;
+      
       // Create new user
       const newUser = {
-        id: Date.now().toString(),
+        id: userId,
         name,
         email,
         password, // Note: In a real app, you would hash this password
         role: "user" as UserRole, // Default role for new registrations
-        verified: false
       };
       
       // Add to users array
       existingUsers.push(newUser);
       localStorage.setItem("quetras_users", JSON.stringify(existingUsers));
       
-      // Log the user in automatically
-      const authenticatedUser: User = {
-        id: newUser.id,
-        name: newUser.name,
-        email: newUser.email,
-        role: newUser.role,
-        verified: newUser.verified
-      };
-      
-      setUser(authenticatedUser);
-      setIsLoggedIn(true);
-      setIsAdmin(authenticatedUser.role === "admin");
-      localStorage.setItem("quetras_user", JSON.stringify(authenticatedUser));
-      
-      toast.success("Registration successful");
-      
-      // Send verification email
-      sendVerificationEmail(email, name);
+      toast.success("Registration successful! Please log in with your new account.");
       
       return true;
     } catch (error) {
