@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
@@ -15,7 +14,6 @@ const mockQueryDetails: Record<string, QueryDetailData> = {
     studentId: "ST-78901",
     queryTitle: "Scholarship Application",
     description: "Application for the Merit Scholarship Program for the Fall 2023 semester. Student has maintained a GPA of 3.8 and is eligible for consideration.",
-    amount: 1500.00,
     date: "September 15, 2023",
     time: "10:30 AM",
     status: "completed",
@@ -48,7 +46,6 @@ const mockQueryDetails: Record<string, QueryDetailData> = {
     studentId: "ST-78902",
     queryTitle: "Late Payment Fee",
     description: "Request to waive the late payment fee of $250 due to technical issues with the payment portal. Student attempted to make the payment before the deadline but encountered system errors.",
-    amount: 250.00,
     date: "September 18, 2023",
     time: "02:15 PM",
     status: "processing",
@@ -71,7 +68,6 @@ const mockQueryDetails: Record<string, QueryDetailData> = {
     studentId: "ST-78903",
     queryTitle: "Payment Plan Request",
     description: "Request to set up a payment plan for the tuition fees for the current semester. Student is facing financial constraints and would like to pay in three installments over the next three months.",
-    amount: 3200.00,
     date: "September 20, 2023",
     time: "11:45 AM",
     status: "pending",
@@ -98,8 +94,7 @@ const mockQueryDetails: Record<string, QueryDetailData> = {
     studentName: "James Wilson",
     studentId: "ST-78904",
     queryTitle: "Refund Request",
-    description: "Request for a refund of $750 for the course 'Advanced Data Structures' which the student dropped within the refund eligibility period. Student has provided the course withdrawal confirmation.",
-    amount: 750.00,
+    description: "Request for a refund for the course 'Advanced Data Structures' which the student dropped within the refund eligibility period. Student has provided the course withdrawal confirmation.",
     date: "September 22, 2023",
     time: "09:30 AM",
     status: "new",

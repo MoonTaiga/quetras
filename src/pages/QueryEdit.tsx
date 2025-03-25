@@ -4,9 +4,11 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Save, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { ArrowLeft } from "lucide-react";
+import { Footer } from "@/components/layout/Footer";
 import {
   Card,
   CardContent,
@@ -21,136 +23,143 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { QueryData } from "@/components/dashboard/QueryTable";
+import { Textarea } from "@/components/ui/textarea";
+import { QueryDetailData } from "@/components/queries/QueryDetail";
 
 const QueryEdit = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [query, setQuery] = useState<QueryData | null>(null);
+  const { isAdmin, isLoggedIn } = useAuth();
+  const [isSaving, setIsSaving] = useState(false);
+  const [query, setQuery] = useState<QueryDetailData | null>(null);
   
   // Form state
   const [queryTitle, setQueryTitle] = useState("");
   const [status, setStatus] = useState<"new" | "processing" | "pending" | "completed" | "cancelled">("new");
-
+  const [description, setDescription] = useState("");
+  
   useEffect(() => {
-    // Get queries from localStorage
-    const storedQueries = localStorage.getItem("quetras_queries");
-    
-    if (storedQueries) {
-      try {
-        const parsedQueries = JSON.parse(storedQueries);
-        const foundQuery = parsedQueries.find((q: QueryData) => q.id === id);
-        
-        if (foundQuery) {
-          setQuery(foundQuery);
-          setQueryTitle(foundQuery.queryTitle);
-          setStatus(foundQuery.status);
-        } else {
-          // Query not found, redirect to queries list
-          toast.error("Query not found");
-          navigate("/queries");
-        }
-      } catch (error) {
-        console.error("Failed to parse stored queries:", error);
-      }
+    // Redirect to login if not logged in
+    if (!isLoggedIn) {
+      navigate("/login");
+      return;
     }
-  }, [id, navigate]);
-
+    
+    // Load query data if ID exists
+    if (id) {
+      const storedQueries = localStorage.getItem("quetras_queries");
+      if (storedQueries) {
+        try {
+          const queries = JSON.parse(storedQueries);
+          const foundQuery = queries.find((q: any) => q.id === id);
+          
+          if (foundQuery) {
+            setQuery(foundQuery);
+            
+            // Initialize form with query data
+            setQueryTitle(foundQuery.queryTitle || "");
+            setStatus(foundQuery.status || "new");
+            setDescription(foundQuery.description || "");
+          } else {
+            // Query not found, navigate back to queries list
+            toast.error("Query not found");
+            navigate("/queries");
+          }
+        } catch (error) {
+          console.error("Failed to parse stored queries:", error);
+          toast.error("Failed to load query data");
+        }
+      }
+    } else {
+      // No ID provided, navigate back to queries list
+      navigate("/queries");
+    }
+  }, [id, isLoggedIn, navigate]);
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!queryTitle) {
-      toast.error("Please fill in all fields");
+    if (!isLoggedIn) {
+      toast.error("You must be logged in to update a query");
+      navigate("/login");
       return;
     }
-
-    setIsSubmitting(true);
     
-    // Get existing queries from localStorage
+    if (!queryTitle) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+    
+    setIsSaving(true);
+    
+    // Get current queries from localStorage
     const storedQueries = localStorage.getItem("quetras_queries");
-    
-    if (storedQueries && query) {
+    if (storedQueries && id) {
       try {
-        const parsedQueries = JSON.parse(storedQueries);
+        const queries = JSON.parse(storedQueries);
         
-        // Find and update the query
-        const updatedQueries = parsedQueries.map((q: QueryData) => {
-          if (q.id === id) {
-            return {
-              ...q,
-              queryTitle,
-              status,
-            };
-          }
-          return q;
-        });
+        // Find the query to update
+        const queryIndex = queries.findIndex((q: any) => q.id === id);
         
-        // Save to localStorage
-        localStorage.setItem("quetras_queries", JSON.stringify(updatedQueries));
-        
-        setTimeout(() => {
-          setIsSubmitting(false);
+        if (queryIndex !== -1) {
+          // Update query with form data
+          queries[queryIndex] = {
+            ...queries[queryIndex],
+            queryTitle,
+            status,
+            description,
+          };
           
-          toast.success("Query updated successfully");
+          // Save updated queries to localStorage
+          localStorage.setItem("quetras_queries", JSON.stringify(queries));
           
-          // Redirect to the queries list
-          navigate("/queries");
-        }, 1000);
+          // Simulate asynchronous operation
+          setTimeout(() => {
+            setIsSaving(false);
+            toast.success("Query updated successfully");
+            
+            // Trigger storage event for other tabs
+            window.dispatchEvent(new Event("storage"));
+            
+            // Navigate back to query details
+            navigate(`/query/${id}`);
+          }, 1000);
+        } else {
+          setIsSaving(false);
+          toast.error("Query not found");
+        }
       } catch (error) {
         console.error("Failed to update query:", error);
-        setIsSubmitting(false);
+        setIsSaving(false);
         toast.error("Failed to update query");
       }
     }
   };
-
-  const handleDelete = () => {
-    const storedQueries = localStorage.getItem("quetras_queries");
-    
-    if (storedQueries) {
-      try {
-        const parsedQueries = JSON.parse(storedQueries);
-        const updatedQueries = parsedQueries.filter((q: QueryData) => q.id !== id);
-        
-        // Save to localStorage
-        localStorage.setItem("quetras_queries", JSON.stringify(updatedQueries));
-        
-        toast.success("Query deleted successfully");
-        
-        // Redirect to the queries list
-        navigate("/queries");
-      } catch (error) {
-        console.error("Failed to delete query:", error);
-        toast.error("Failed to delete query");
-      }
-    }
-  };
-
+  
   if (!query) {
     return (
       <main className="min-h-screen flex flex-col bg-background">
         <Header />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <p className="text-muted-foreground mb-4">Loading query...</p>
+        <Container className="flex-1 py-8 animate-fade-in" withGlass={false}>
+          <div className="flex justify-center items-center h-full">
+            <div className="text-center">
+              <h2 className="text-xl font-semibold mb-2">Loading query data...</h2>
+              <p className="text-muted-foreground">Please wait or return to queries.</p>
+              <Button 
+                variant="outline" 
+                className="mt-4"
+                onClick={() => navigate("/queries")}
+              >
+                Back to Queries
+              </Button>
+            </div>
           </div>
-        </div>
+        </Container>
+        <Footer />
       </main>
     );
   }
-
+  
   return (
     <main className="min-h-screen flex flex-col bg-background">
       <Header />
@@ -161,45 +170,18 @@ const QueryEdit = () => {
             className="mb-4 -ml-3"
             asChild
           >
-            <Link to="/queries">
+            <Link to={`/query/${id}`}>
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Queries
+              Back to Query
             </Link>
           </Button>
-
+          
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle className="text-2xl">Edit Query #{query.id}</CardTitle>
-                <CardDescription>
-                  Update your tuition payment query
-                </CardDescription>
-              </div>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10">
-                    <Trash2 className="h-5 w-5" />
-                    <span className="sr-only">Delete query</span>
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Delete this query?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete the query from the system.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction 
-                      onClick={handleDelete}
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    >
-                      Delete
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+            <CardHeader>
+              <CardTitle className="text-2xl">Edit Query</CardTitle>
+              <CardDescription>
+                Update the details for query #{id}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -210,79 +192,69 @@ const QueryEdit = () => {
                     </label>
                     <Input
                       id="queryTitle"
-                      placeholder="e.g., Scholarship Application, Refund Request"
                       value={queryTitle}
                       onChange={(e) => setQueryTitle(e.target.value)}
                       required
                     />
                   </div>
                   
+                  {isAdmin && (
+                    <div>
+                      <label htmlFor="status" className="block text-sm font-medium mb-1">
+                        Status
+                      </label>
+                      <Select 
+                        value={status} 
+                        onValueChange={(value: any) => setStatus(value)}
+                      >
+                        <SelectTrigger id="status">
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="new">New</SelectItem>
+                          <SelectItem value="processing">Processing</SelectItem>
+                          <SelectItem value="pending">Pending</SelectItem>
+                          <SelectItem value="completed">Completed</SelectItem>
+                          <SelectItem value="cancelled">Cancelled</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                  
                   <div>
-                    <label htmlFor="status" className="block text-sm font-medium mb-1">
-                      Status
+                    <label htmlFor="description" className="block text-sm font-medium mb-1">
+                      Description
                     </label>
-                    <Select 
-                      value={status} 
-                      onValueChange={(value) => setStatus(value as any)}
-                    >
-                      <SelectTrigger id="status" className="w-full">
-                        <SelectValue placeholder="Select status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="new">New</SelectItem>
-                        <SelectItem value="processing">Processing</SelectItem>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="completed">Completed</SelectItem>
-                        <SelectItem value="cancelled">Cancelled</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Date Submitted
-                    </label>
-                    <Input
-                      value={query.date}
-                      disabled
-                      className="bg-muted/30"
+                    <Textarea
+                      id="description"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      rows={5}
                     />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Amount
-                    </label>
-                    <Input
-                      value={`$${query.amount.toFixed(2)}`}
-                      disabled
-                      className="bg-muted/30"
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Amount cannot be modified after submission
-                    </p>
                   </div>
                 </div>
                 
-                <Button 
-                  type="submit" 
-                  className="w-full bg-sky-600 hover:bg-sky-700"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    "Updating..."
-                  ) : (
-                    <>
-                      <Save className="mr-2 h-4 w-4" />
-                      Save Changes
-                    </>
-                  )}
-                </Button>
+                <div className="flex justify-end space-x-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => navigate(`/query/${id}`)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    disabled={isSaving}
+                  >
+                    {isSaving ? "Saving..." : "Save Changes"}
+                  </Button>
+                </div>
               </form>
             </CardContent>
           </Card>
         </Container>
       </div>
+      <Footer />
     </main>
   );
 };
