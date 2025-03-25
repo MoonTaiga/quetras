@@ -8,6 +8,7 @@ import { QueryHeader } from "./QueryHeader";
 import { QueryInfo } from "./QueryInfo";
 import { QueryActions } from "./QueryActions";
 import { QueryTimeline } from "./QueryTimeline";
+import { notificationService } from "@/lib/notification-service";
 
 export interface QueryDetailData {
   id: string;
@@ -17,7 +18,9 @@ export interface QueryDetailData {
   description: string;
   date: string;
   time: string;
-  status: "new" | "processing" | "pending" | "completed" | "cancelled";
+  status: "new" | "processing";
+  timestamp?: string; // ISO date string
+  cashierWindow?: string;
   timeline?: {
     date: string;
     title: string;
@@ -31,7 +34,7 @@ interface QueryDetailProps {
 }
 
 const QueryDetail = ({ query, className }: QueryDetailProps) => {
-  const { isAdmin } = useAuth();
+  const { isAdmin, user } = useAuth();
   const navigate = useNavigate();
   const [showNoteForm, setShowNoteForm] = useState(false);
   const [note, setNote] = useState("");
@@ -48,12 +51,8 @@ const QueryDetail = ({ query, className }: QueryDetailProps) => {
         const queryIndex = queries.findIndex((q: any) => q.id === query.id);
         
         if (queryIndex !== -1) {
-          // Update the status to cancelled
-          queries[queryIndex].status = "cancelled";
-          
-          // Reorder queries - move cancelled query to the end
-          const cancelledQuery = queries.splice(queryIndex, 1)[0];
-          queries.push(cancelledQuery);
+          // Remove the query
+          queries.splice(queryIndex, 1);
           
           // Save updated queries back to localStorage
           localStorage.setItem("quetras_queries", JSON.stringify(queries));
@@ -74,11 +73,24 @@ const QueryDetail = ({ query, className }: QueryDetailProps) => {
   const addNote = () => {
     if (note.trim()) {
       // In a real app, this would make an API call to add the note to the query
+      
+      // For demo, let's send a notification to the student
+      if (query.studentId) {
+        notificationService.sendNotification(
+          query.studentId,
+          "New note on your query",
+          note
+        );
+      }
+      
       toast.success("Note added successfully");
       setShowNoteForm(false);
       setNote("");
     }
   };
+
+  // Check if this query belongs to the current user
+  const isOwner = user?.id === query.studentId;
 
   return (
     <div className={className}>
@@ -87,6 +99,10 @@ const QueryDetail = ({ query, className }: QueryDetailProps) => {
           id={query.id} 
           title={query.queryTitle} 
           status={query.status} 
+          studentId={query.studentId}
+          studentName={query.studentName}
+          timestamp={query.timestamp}
+          cashierWindow={query.cashierWindow}
         />
         <CardContent className="p-6">
           <QueryInfo 
@@ -95,6 +111,7 @@ const QueryDetail = ({ query, className }: QueryDetailProps) => {
             date={query.date}
             time={query.time}
             description={query.description}
+            cashierWindow={query.cashierWindow}
           />
           
           <QueryActions 
@@ -103,6 +120,7 @@ const QueryDetail = ({ query, className }: QueryDetailProps) => {
             queryTitle={query.queryTitle}
             status={query.status}
             isAdmin={isAdmin}
+            isOwner={isOwner}
             showNoteForm={showNoteForm}
             setShowNoteForm={setShowNoteForm}
             note={note}

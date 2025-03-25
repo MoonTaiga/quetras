@@ -1,16 +1,27 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { useAuth } from "@/contexts/AuthContext";
 import { Logo } from "@/components/layout/Logo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { User, LogOut } from "lucide-react";
 
 export const Header: React.FC = () => {
   const { user, isLoggedIn, logout } = useAuth();
   const navigate = useNavigate();
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (user?.id) {
+      const storedImage = localStorage.getItem(`profile_image_${user.id}`);
+      if (storedImage) {
+        setProfileImage(storedImage);
+      }
+    }
+  }, [user]);
 
   const handleLogout = () => {
     logout();
@@ -48,9 +59,16 @@ export const Header: React.FC = () => {
           <ThemeToggle />
           {isLoggedIn ? (
             <div className="flex items-center gap-3">
-              <Button variant="ghost" asChild className="hover:bg-accent flex gap-2">
+              <Button variant="ghost" asChild className="hover:bg-accent flex gap-2 items-center">
                 <Link to="/profile">
-                  <User className="h-4 w-4" />
+                  {profileImage ? (
+                    <Avatar className="h-8 w-8 mr-2">
+                      <AvatarImage src={profileImage} alt={user?.name || "User"} />
+                      <AvatarFallback>{user?.name?.split(" ").map(n => n[0]).join("") || "U"}</AvatarFallback>
+                    </Avatar>
+                  ) : (
+                    <User className="h-4 w-4 mr-2" />
+                  )}
                   <span>{user?.name?.split(" ")[0]}</span>
                 </Link>
               </Button>

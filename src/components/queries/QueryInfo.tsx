@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Separator } from "@/components/ui/separator";
-import { Calendar, Clock, User } from "lucide-react";
+import { Calendar, Clock, User, CreditCard } from "lucide-react";
 
 interface QueryInfoProps {
   studentName: string;
@@ -9,6 +9,7 @@ interface QueryInfoProps {
   date: string;
   time: string;
   description: string;
+  cashierWindow?: string;
 }
 
 export const QueryInfo = ({ 
@@ -16,7 +17,8 @@ export const QueryInfo = ({
   studentId, 
   date, 
   time, 
-  description 
+  description,
+  cashierWindow 
 }: QueryInfoProps) => {
   return (
     <>
@@ -58,6 +60,18 @@ export const QueryInfo = ({
               <div className="mt-1">{time}</div>
             </div>
           </div>
+          
+          {cashierWindow && (
+            <div className="flex items-start gap-3">
+              <div className="mt-1 rounded-full bg-primary/10 p-1.5">
+                <CreditCard className="h-4 w-4 text-primary" />
+              </div>
+              <div>
+                <div className="text-sm font-medium">Cashier Window</div>
+                <div className="mt-1">{cashierWindow}</div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

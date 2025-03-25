@@ -3,7 +3,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
-type StatusType = "new" | "processing" | "pending" | "completed" | "cancelled";
+type StatusType = "new" | "processing";
 
 interface StatusBadgeProps {
   status: StatusType;
@@ -21,21 +21,6 @@ const getStatusConfig = (status: StatusType) => {
       return {
         label: "Processing",
         className: "bg-amber-100 text-amber-700 hover:bg-amber-200",
-      };
-    case "pending":
-      return {
-        label: "Pending",
-        className: "bg-purple-100 text-purple-700 hover:bg-purple-200",
-      };
-    case "completed":
-      return {
-        label: "Completed",
-        className: "bg-green-100 text-green-700 hover:bg-green-200",
-      };
-    case "cancelled":
-      return {
-        label: "Cancelled",
-        className: "bg-red-100 text-red-700 hover:bg-red-200",
       };
     default:
       return {

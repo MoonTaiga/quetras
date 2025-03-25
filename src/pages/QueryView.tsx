@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
@@ -16,7 +17,9 @@ const mockQueryDetails: Record<string, QueryDetailData> = {
     description: "Application for the Merit Scholarship Program for the Fall 2023 semester. Student has maintained a GPA of 3.8 and is eligible for consideration.",
     date: "September 15, 2023",
     time: "10:30 AM",
-    status: "completed",
+    status: "processing",
+    timestamp: "2023-09-15T10:30:00Z",
+    cashierWindow: "Window 3",
     timeline: [
       {
         date: "September 15, 2023 - 10:30 AM",
@@ -27,16 +30,6 @@ const mockQueryDetails: Record<string, QueryDetailData> = {
         date: "September 16, 2023 - 09:15 AM",
         title: "Under Review",
         description: "Application is being reviewed by the financial aid department."
-      },
-      {
-        date: "September 18, 2023 - 02:45 PM",
-        title: "Approved",
-        description: "Scholarship application has been approved. Student is eligible for $1,500 scholarship."
-      },
-      {
-        date: "September 20, 2023 - 11:20 AM",
-        title: "Completed",
-        description: "Scholarship amount has been credited to student's account. Notification sent to student."
       }
     ]
   },
@@ -49,6 +42,8 @@ const mockQueryDetails: Record<string, QueryDetailData> = {
     date: "September 18, 2023",
     time: "02:15 PM",
     status: "processing",
+    timestamp: "2023-09-18T14:15:00Z",
+    cashierWindow: "Window 1",
     timeline: [
       {
         date: "September 18, 2023 - 02:15 PM",
@@ -70,22 +65,14 @@ const mockQueryDetails: Record<string, QueryDetailData> = {
     description: "Request to set up a payment plan for the tuition fees for the current semester. Student is facing financial constraints and would like to pay in three installments over the next three months.",
     date: "September 20, 2023",
     time: "11:45 AM",
-    status: "pending",
+    status: "new",
+    timestamp: "2023-09-20T11:45:00Z",
+    cashierWindow: "Window 2",
     timeline: [
       {
         date: "September 20, 2023 - 11:45 AM",
         title: "Query Submitted",
         description: "Student submitted the payment plan request."
-      },
-      {
-        date: "September 21, 2023 - 09:30 AM",
-        title: "Under Review",
-        description: "Request is being evaluated by the finance department."
-      },
-      {
-        date: "September 22, 2023 - 03:15 PM",
-        title: "Additional Information Requested",
-        description: "Finance department has requested additional financial documents from the student."
       }
     ]
   },
@@ -98,6 +85,8 @@ const mockQueryDetails: Record<string, QueryDetailData> = {
     date: "September 22, 2023",
     time: "09:30 AM",
     status: "new",
+    timestamp: "2023-09-22T09:30:00Z",
+    cashierWindow: "Window 1",
     timeline: [
       {
         date: "September 22, 2023 - 09:30 AM",
