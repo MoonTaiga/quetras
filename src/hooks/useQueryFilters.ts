@@ -95,6 +95,26 @@ export const useQueryFilters = (initialQueries: QueryData[] = []) => {
     setSearchParams({});
   };
 
+  const handleDeleteQuery = (id: string) => {
+    // Get current queries from localStorage
+    const storedQueries = localStorage.getItem("quetras_queries");
+    if (storedQueries) {
+      try {
+        const parsedQueries = JSON.parse(storedQueries);
+        // Filter out the query to be deleted
+        const updatedQueries = parsedQueries.filter((query: QueryData) => query.id !== id);
+        // Update localStorage
+        localStorage.setItem("quetras_queries", JSON.stringify(updatedQueries));
+        // Update state
+        setQueries(updatedQueries);
+        // Trigger storage event for other tabs
+        window.dispatchEvent(new Event("storage"));
+      } catch (error) {
+        console.error("Failed to delete query:", error);
+      }
+    }
+  };
+
   return {
     searchQuery,
     setSearchQuery,
@@ -102,6 +122,7 @@ export const useQueryFilters = (initialQueries: QueryData[] = []) => {
     setFilterStatus,
     filteredQueries,
     handleSearch,
-    handleClearFilters
+    handleClearFilters,
+    handleDeleteQuery
   };
 };

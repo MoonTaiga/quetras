@@ -11,7 +11,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Edit, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 export interface QueryData {
   id: string;
@@ -25,9 +38,27 @@ export interface QueryData {
 interface QueryTableProps {
   queries: QueryData[];
   className?: string;
+  onDeleteQuery?: (id: string) => void;
 }
 
-const QueryTable = ({ queries, className }: QueryTableProps) => {
+const QueryTable = ({ queries, className, onDeleteQuery }: QueryTableProps) => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleDelete = (id: string) => {
+    if (onDeleteQuery) {
+      onDeleteQuery(id);
+      toast({
+        title: "Query deleted",
+        description: "The query has been successfully deleted.",
+      });
+    }
+  };
+
+  const handleEdit = (id: string) => {
+    navigate(`/query/${id}/edit`);
+  };
+
   return (
     <div className={className}>
       <Table>
@@ -39,7 +70,7 @@ const QueryTable = ({ queries, className }: QueryTableProps) => {
             <TableHead className="text-right">Amount</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead className="text-right">Action</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -61,17 +92,59 @@ const QueryTable = ({ queries, className }: QueryTableProps) => {
                 <StatusBadge status={query.status} />
               </TableCell>
               <TableCell className="text-right">
-                <Button
-                  asChild
-                  variant="ghost"
-                  size="icon"
-                  className="rounded-full h-8 w-8 transition-transform hover:scale-110 hover:bg-muted"
-                >
-                  <Link to={`/query/${query.id}`}>
-                    <ArrowRight className="h-4 w-4" />
-                    <span className="sr-only">View query</span>
-                  </Link>
-                </Button>
+                <div className="flex items-center justify-end gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full h-8 w-8 transition-transform hover:scale-110 hover:bg-muted"
+                    onClick={() => handleEdit(query.id)}
+                  >
+                    <Edit className="h-4 w-4" />
+                    <span className="sr-only">Edit query</span>
+                  </Button>
+                  
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="rounded-full h-8 w-8 transition-transform hover:scale-110 hover:bg-destructive/10 hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Delete query</span>
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete this query?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently delete the query from the system.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={() => handleDelete(query.id)}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                  
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full h-8 w-8 transition-transform hover:scale-110 hover:bg-muted"
+                  >
+                    <Link to={`/query/${query.id}`}>
+                      <ArrowRight className="h-4 w-4" />
+                      <span className="sr-only">View query</span>
+                    </Link>
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}

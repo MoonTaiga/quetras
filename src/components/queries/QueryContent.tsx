@@ -13,6 +13,7 @@ interface QueryContentProps {
   setFilterStatus: React.Dispatch<React.SetStateAction<string>>;
   onSearch: (e: React.FormEvent) => void;
   onClearFilters: () => void;
+  onDeleteQuery: (id: string) => void;
 }
 
 export const QueryContent: React.FC<QueryContentProps> = ({
@@ -22,7 +23,8 @@ export const QueryContent: React.FC<QueryContentProps> = ({
   filterStatus,
   setFilterStatus,
   onSearch,
-  onClearFilters
+  onClearFilters,
+  onDeleteQuery
 }) => {
   return (
     <Container as="section" className="py-8 animate-fade-in" withGlass={false}>
@@ -35,7 +37,10 @@ export const QueryContent: React.FC<QueryContentProps> = ({
       />
 
       <div className="glass rounded-xl p-1 overflow-hidden transition-all hover:shadow-soft">
-        <QueryTable queries={filteredQueries} />
+        <QueryTable 
+          queries={filteredQueries} 
+          onDeleteQuery={onDeleteQuery}
+        />
       </div>
       
       {filteredQueries.length === 0 && (

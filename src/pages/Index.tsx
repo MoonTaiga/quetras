@@ -16,11 +16,13 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Footer } from "@/components/layout/Footer";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const { isAdmin, isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const [queries, setQueries] = React.useState<QueryData[]>([]);
+  const { toast } = useToast();
 
   React.useEffect(() => {
     // Get queries from localStorage if available
@@ -47,6 +49,31 @@ const Index = () => {
       navigate("/login");
     } else {
       navigate("/online-payment");
+    }
+  };
+
+  const handleDeleteQuery = (id: string) => {
+    // Get current queries from localStorage
+    const storedQueries = localStorage.getItem("quetras_queries");
+    if (storedQueries) {
+      try {
+        const parsedQueries = JSON.parse(storedQueries);
+        // Filter out the query to be deleted
+        const updatedQueries = parsedQueries.filter((query: QueryData) => query.id !== id);
+        // Update localStorage
+        localStorage.setItem("quetras_queries", JSON.stringify(updatedQueries));
+        // Update state
+        setQueries(updatedQueries);
+        // Trigger storage event for other tabs
+        window.dispatchEvent(new Event("storage"));
+        
+        toast({
+          title: "Query deleted",
+          description: "The query has been successfully deleted.",
+        });
+      } catch (error) {
+        console.error("Failed to delete query:", error);
+      }
     }
   };
 
@@ -118,7 +145,10 @@ const Index = () => {
               </Button>
             </div>
             <div className="glass rounded-xl p-1 overflow-hidden">
-              <QueryTable queries={queries.slice(0, 5)} />
+              <QueryTable 
+                queries={queries.slice(0, 5)} 
+                onDeleteQuery={handleDeleteQuery}
+              />
             </div>
           </div>
         </Container>

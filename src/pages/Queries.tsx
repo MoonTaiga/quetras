@@ -16,7 +16,8 @@ const Queries = () => {
     setFilterStatus,
     filteredQueries,
     handleSearch,
-    handleClearFilters
+    handleClearFilters,
+    handleDeleteQuery
   } = useQueryFilters(initialQueries);
 
   return (
@@ -31,6 +32,7 @@ const Queries = () => {
           setFilterStatus={setFilterStatus}
           onSearch={handleSearch}
           onClearFilters={handleClearFilters}
+          onDeleteQuery={handleDeleteQuery}
         />
       </div>
       <Footer />
