@@ -44,14 +44,6 @@ const Index = () => {
     }
   };
 
-  const handleOnlinePayment = () => {
-    if (!isLoggedIn) {
-      navigate("/login");
-    } else {
-      navigate("/online-payment");
-    }
-  };
-
   const handleDeleteQuery = (id: string) => {
     // Get current queries from localStorage
     const storedQueries = localStorage.getItem("quetras_queries");
@@ -90,11 +82,6 @@ const Index = () => {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              {!isAdmin && (
-                <Button variant="outline" onClick={handleOnlinePayment}>
-                  Online Payment
-                </Button>
-              )}
               <Button onClick={handleNewQuery}>
                 <Plus className="mr-2 h-4 w-4" />
                 New Query

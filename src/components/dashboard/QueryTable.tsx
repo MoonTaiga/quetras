@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -139,9 +139,9 @@ const QueryTable = ({ queries, className, onDeleteQuery }: QueryTableProps) => {
                     size="icon"
                     className="rounded-full h-8 w-8 transition-transform hover:scale-110 hover:bg-muted"
                   >
-                    <Link to={`/query/${query.id}`}>
-                      <ArrowRight className="h-4 w-4" />
-                      <span className="sr-only">View query</span>
+                    <Link to={`/query/${query.id}/edit`}>
+                      <Edit className="h-4 w-4" />
+                      <span className="sr-only">Edit query</span>
                     </Link>
                   </Button>
                 </div>

@@ -25,7 +25,6 @@ const NewQuery = () => {
   
   // Form state
   const [queryTitle, setQueryTitle] = useState("");
-  const [amount, setAmount] = useState("");
 
   useEffect(() => {
     // Redirect to login if not logged in
@@ -43,13 +42,17 @@ const NewQuery = () => {
       return;
     }
 
-    if (!queryTitle || !amount) {
+    if (!queryTitle) {
       toast.error("Please fill in all fields");
       return;
     }
 
     setIsSubmitting(true);
 
+    // Get existing queries to determine query number
+    const existingQueries = JSON.parse(localStorage.getItem("quetras_queries") || "[]");
+    const queryNumber = existingQueries.length + 1;
+    
     // Generate a new query ID
     const newQueryId = `TQ-${Math.floor(1000 + Math.random() * 9000)}`;
     
@@ -58,13 +61,10 @@ const NewQuery = () => {
       id: newQueryId,
       studentName: user?.name || "Anonymous",
       queryTitle: queryTitle,
-      amount: parseFloat(amount),
+      amount: queryNumber * 100, // Auto-calculated amount based on query number
       date: new Date().toISOString().split('T')[0],
       status: "new",
     };
-    
-    // Get existing queries from localStorage
-    const existingQueries = JSON.parse(localStorage.getItem("quetras_queries") || "[]");
     
     // Add new query to existing queries
     const updatedQueries = [newQuery, ...existingQueries];
@@ -121,7 +121,7 @@ const NewQuery = () => {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-4">
                   <div>
-                    <label htmlFor="queryTitle" className="block text-sm font-medium mb-1">
+                    <label htmlFor="queryTitle" className="block text-sm font-medium mb-1 text-foreground">
                       Query Title
                     </label>
                     <Input
@@ -133,22 +133,9 @@ const NewQuery = () => {
                     />
                   </div>
                   
-                  <div>
-                    <label htmlFor="amount" className="block text-sm font-medium mb-1">
-                      Amount ($)
-                    </label>
-                    <Input
-                      id="amount"
-                      type="number"
-                      placeholder="0.00"
-                      min="0"
-                      step="0.01"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      required
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Enter the amount related to your query
+                  <div className="bg-muted/20 p-4 rounded-md border border-border">
+                    <p className="text-sm text-foreground">
+                      <strong>Important:</strong> The query amount will be automatically calculated based on your query number in the system.
                     </p>
                   </div>
                 </div>
