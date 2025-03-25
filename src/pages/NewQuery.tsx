@@ -51,7 +51,6 @@ const NewQuery = () => {
 
     // Get existing queries to determine query number
     const existingQueries = JSON.parse(localStorage.getItem("quetras_queries") || "[]");
-    const queryNumber = existingQueries.length + 1;
     
     // Generate a new query ID
     const newQueryId = `TQ-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -61,7 +60,6 @@ const NewQuery = () => {
       id: newQueryId,
       studentName: user?.name || "Anonymous",
       queryTitle: queryTitle,
-      amount: queryNumber * 100, // Auto-calculated amount based on query number
       date: new Date().toISOString().split('T')[0],
       status: "new",
     };
@@ -131,12 +129,6 @@ const NewQuery = () => {
                       onChange={(e) => setQueryTitle(e.target.value)}
                       required
                     />
-                  </div>
-                  
-                  <div className="bg-muted/20 p-4 rounded-md border border-border">
-                    <p className="text-sm text-foreground">
-                      <strong>Important:</strong> The query amount will be automatically calculated based on your query number in the system.
-                    </p>
                   </div>
                 </div>
                 

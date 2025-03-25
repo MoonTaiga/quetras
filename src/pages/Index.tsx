@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { 
   CalendarClock, 
-  DollarSign, 
   FileText, 
   Plus, 
   Users 
@@ -89,7 +88,7 @@ const Index = () => {
             </div>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <StatCard
               title="Total Queries"
               value={queries.length.toString()}
@@ -111,14 +110,6 @@ const Index = () => {
               value="1.5 days"
               description="Average resolution time"
               icon={CalendarClock}
-              trend="neutral"
-              trendValue=""
-            />
-            <StatCard
-              title="Total Amount"
-              value={`$${queries.reduce((sum, query) => sum + (query.amount || 0), 0).toFixed(2)}`}
-              description="All queries"
-              icon={DollarSign}
               trend="neutral"
               trendValue=""
             />

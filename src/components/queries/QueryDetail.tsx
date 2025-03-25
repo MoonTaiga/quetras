@@ -1,11 +1,10 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { Calendar, Clock, DollarSign, User, Bell, X, Plus } from "lucide-react";
+import { Calendar, Clock, User, Bell, X, Plus } from "lucide-react";
 import { notificationService } from "@/lib/notification-service";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -17,7 +16,6 @@ export interface QueryDetailData {
   studentId: string;
   queryTitle: string;
   description: string;
-  amount: number;
   date: string;
   time: string;
   status: "new" | "processing" | "pending" | "completed" | "cancelled";
@@ -139,18 +137,6 @@ const QueryDetail = ({ query, className }: QueryDetailProps) => {
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="mt-1 rounded-full bg-primary/10 p-1.5">
-                  <DollarSign className="h-4 w-4 text-primary" />
-                </div>
-                <div>
-                  <div className="text-sm font-medium">Amount</div>
-                  <div className="mt-1 text-lg font-semibold">
-                    ${query.amount.toFixed(2)}
-                  </div>
-                </div>
-              </div>
-
               <div className="flex items-start gap-3">
                 <div className="mt-1 rounded-full bg-primary/10 p-1.5">
                   <Clock className="h-4 w-4 text-primary" />

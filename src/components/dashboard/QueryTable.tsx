@@ -30,7 +30,6 @@ export interface QueryData {
   id: string;
   studentName: string;
   queryTitle: string;
-  amount: number;
   date: string;
   status: "new" | "processing" | "pending" | "completed" | "cancelled";
 }
@@ -67,7 +66,6 @@ const QueryTable = ({ queries, className, onDeleteQuery }: QueryTableProps) => {
             <TableHead>ID</TableHead>
             <TableHead>Student</TableHead>
             <TableHead>Title</TableHead>
-            <TableHead className="text-right">Amount</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="text-right">Actions</TableHead>
@@ -84,9 +82,6 @@ const QueryTable = ({ queries, className, onDeleteQuery }: QueryTableProps) => {
               <TableCell className="font-medium">{query.id}</TableCell>
               <TableCell>{query.studentName}</TableCell>
               <TableCell>{query.queryTitle}</TableCell>
-              <TableCell className="text-right">
-                ${query.amount.toFixed(2)}
-              </TableCell>
               <TableCell>{query.date}</TableCell>
               <TableCell>
                 <StatusBadge status={query.status} />
