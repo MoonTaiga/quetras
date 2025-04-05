@@ -12,6 +12,7 @@ interface QueryActionsProps {
   queryTitle: string;
   status: string;
   isAdmin: boolean;
+  isOwner: boolean;
   showNoteForm: boolean;
   setShowNoteForm: (show: boolean) => void;
   note: string;
@@ -26,6 +27,7 @@ export const QueryActions = ({
   queryTitle,
   status,
   isAdmin,
+  isOwner,
   showNoteForm,
   setShowNoteForm,
   note,
@@ -110,14 +112,16 @@ export const QueryActions = ({
               <Plus className="h-4 w-4" />
               Add Query
             </Button>
-            <Button 
-              variant="outline"
-              onClick={cancelQuery}
-              className="flex items-center gap-2 text-destructive hover:bg-destructive/10 transition-all"
-            >
-              <X className="h-4 w-4" />
-              Cancel Query
-            </Button>
+            {isOwner && (
+              <Button 
+                variant="outline"
+                onClick={cancelQuery}
+                className="flex items-center gap-2 text-destructive hover:bg-destructive/10 transition-all"
+              >
+                <X className="h-4 w-4" />
+                Cancel Query
+              </Button>
+            )}
           </>
         )}
       </div>
