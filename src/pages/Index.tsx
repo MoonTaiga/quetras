@@ -18,7 +18,7 @@ import { Footer } from "@/components/layout/Footer";
 import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
-  const { isAdmin, isLoggedIn } = useAuth();
+  const { isAdmin, isLoggedIn, user } = useAuth();
   const navigate = useNavigate();
   const [queries, setQueries] = React.useState<QueryData[]>([]);
   const { toast } = useToast();
@@ -49,19 +49,31 @@ const Index = () => {
     if (storedQueries) {
       try {
         const parsedQueries = JSON.parse(storedQueries);
-        // Filter out the query to be deleted
-        const updatedQueries = parsedQueries.filter((query: QueryData) => query.id !== id);
-        // Update localStorage
-        localStorage.setItem("quetras_queries", JSON.stringify(updatedQueries));
-        // Update state
-        setQueries(updatedQueries);
-        // Trigger storage event for other tabs
-        window.dispatchEvent(new Event("storage"));
+        // Find the query to be deleted
+        const queryToDelete = parsedQueries.find((query: QueryData) => query.id === id);
         
-        toast({
-          title: "Query deleted",
-          description: "The query has been successfully deleted.",
-        });
+        // Check if user has permission to delete
+        if (queryToDelete && (isAdmin || user?.id === queryToDelete.studentId)) {
+          // Filter out the query to be deleted
+          const updatedQueries = parsedQueries.filter((query: QueryData) => query.id !== id);
+          // Update localStorage
+          localStorage.setItem("quetras_queries", JSON.stringify(updatedQueries));
+          // Update state
+          setQueries(updatedQueries);
+          // Trigger storage event for other tabs
+          window.dispatchEvent(new Event("storage"));
+          
+          toast({
+            title: "Query deleted",
+            description: "The query has been successfully deleted.",
+          });
+        } else {
+          toast({
+            title: "Permission denied",
+            description: "You don't have permission to delete this query.",
+            variant: "destructive"
+          });
+        }
       } catch (error) {
         console.error("Failed to delete query:", error);
       }

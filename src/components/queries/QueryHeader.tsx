@@ -65,15 +65,15 @@ export const QueryHeader = ({
         <div className="flex flex-col items-end gap-2">
           <StatusBadge status={status} className="mt-1" />
           
-          {studentId && (
+          {studentId && studentName && (
             <Link to={`/profile?userId=${studentId}`} className="flex items-center gap-2 hover:opacity-80 transition-all">
               <div className="text-sm text-right text-muted-foreground">{studentName}</div>
               <Avatar className="h-8 w-8 transition-transform hover:scale-110">
                 {profileImage ? (
-                  <AvatarImage src={profileImage} alt={studentName || "User"} />
+                  <AvatarImage src={profileImage} alt={studentName} />
                 ) : (
                   <AvatarFallback className="bg-primary/10 text-primary">
-                    {studentName?.split(" ").map(n => n[0]).join("") || "U"}
+                    {studentName.split(" ").map(n => n[0]).join("")}
                   </AvatarFallback>
                 )}
               </Avatar>

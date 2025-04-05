@@ -8,6 +8,17 @@ import { Logo } from "@/components/layout/Logo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { User, LogOut } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export const Header: React.FC = () => {
   const { user, isLoggedIn, logout } = useAuth();
@@ -72,14 +83,35 @@ export const Header: React.FC = () => {
                   <span>{user?.name?.split(" ")[0]}</span>
                 </Link>
               </Button>
-              <Button 
-                variant="ghost" 
-                onClick={handleLogout} 
-                className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
-              </Button>
+              
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Logout Confirmation</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to log out of your account?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction 
+                      onClick={handleLogout}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Log Out
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           ) : (
             <div className="flex items-center gap-2">

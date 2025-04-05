@@ -25,10 +25,12 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 export interface QueryData {
   id: string;
   studentName: string;
+  studentId: string;
   queryTitle: string;
   date: string;
   status: "new" | "processing" | "pending" | "completed" | "cancelled";
@@ -43,6 +45,7 @@ interface QueryTableProps {
 const QueryTable = ({ queries, className, onDeleteQuery }: QueryTableProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, isAdmin } = useAuth();
 
   const handleDelete = (id: string) => {
     if (onDeleteQuery) {
@@ -56,6 +59,11 @@ const QueryTable = ({ queries, className, onDeleteQuery }: QueryTableProps) => {
 
   const handleEdit = (id: string) => {
     navigate(`/query/${id}/edit`);
+  };
+  
+  // Function to check if user can delete a query
+  const canDeleteQuery = (queryStudentId: string) => {
+    return isAdmin || (user && user.id === queryStudentId);
   };
 
   return (
@@ -80,7 +88,14 @@ const QueryTable = ({ queries, className, onDeleteQuery }: QueryTableProps) => {
               }`}
             >
               <TableCell className="font-medium">{query.id}</TableCell>
-              <TableCell>{query.studentName}</TableCell>
+              <TableCell>
+                <Link 
+                  to={`/profile?userId=${query.studentId}`}
+                  className="hover:text-primary transition-colors"
+                >
+                  {query.studentName}
+                </Link>
+              </TableCell>
               <TableCell>{query.queryTitle}</TableCell>
               <TableCell>{query.date}</TableCell>
               <TableCell>
@@ -88,46 +103,6 @@ const QueryTable = ({ queries, className, onDeleteQuery }: QueryTableProps) => {
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex items-center justify-end gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-full h-8 w-8 transition-transform hover:scale-110 hover:bg-muted"
-                    onClick={() => handleEdit(query.id)}
-                  >
-                    <Edit className="h-4 w-4" />
-                    <span className="sr-only">Edit query</span>
-                  </Button>
-                  
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="rounded-full h-8 w-8 transition-transform hover:scale-110 hover:bg-destructive/10 hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Delete query</span>
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Delete this query?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This action cannot be undone. This will permanently delete the query from the system.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction 
-                          onClick={() => handleDelete(query.id)}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        >
-                          Delete
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                  
                   <Button
                     asChild
                     variant="ghost"
@@ -139,6 +114,38 @@ const QueryTable = ({ queries, className, onDeleteQuery }: QueryTableProps) => {
                       <span className="sr-only">Edit query</span>
                     </Link>
                   </Button>
+                  
+                  {canDeleteQuery(query.studentId) && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="rounded-full h-8 w-8 transition-transform hover:scale-110 hover:bg-destructive/10 hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          <span className="sr-only">Delete query</span>
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete this query?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete the query from the system.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction 
+                            onClick={() => handleDelete(query.id)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
                 </div>
               </TableCell>
             </TableRow>
