@@ -1,8 +1,8 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Bell, X, Plus, AlertCircle } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Bell, X, Plus, AlertCircle, Edit } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { notificationService } from "@/lib/notification-service";
 
@@ -13,6 +13,7 @@ interface QueryActionsProps {
   status: string;
   isAdmin: boolean;
   isOwner: boolean;
+  canEdit?: boolean;
   showNoteForm: boolean;
   setShowNoteForm: (show: boolean) => void;
   note: string;
@@ -29,6 +30,7 @@ export const QueryActions = ({
   status,
   isAdmin,
   isOwner,
+  canEdit = false,
   showNoteForm,
   setShowNoteForm,
   note,
@@ -114,9 +116,21 @@ export const QueryActions = ({
               <Bell className="h-4 w-4" />
               Notify Student
             </Button>
+            {canEdit && (
+              <Button
+                variant="outline"
+                asChild
+                className="flex items-center gap-2 transition-all hover:shadow-soft"
+              >
+                <Link to={`/query/${id}/edit`}>
+                  <Edit className="h-4 w-4" />
+                  Edit Query
+                </Link>
+              </Button>
+            )}
           </>
         ) : (
-          // User-only actions - limited to add/cancel
+          // User-only actions
           <>
             <Button 
               onClick={handleAddQuery} 
@@ -125,6 +139,18 @@ export const QueryActions = ({
               <Plus className="h-4 w-4" />
               Add Query
             </Button>
+            {canEdit && (
+              <Button
+                variant="outline"
+                asChild
+                className="flex items-center gap-2 transition-all hover:shadow-soft"
+              >
+                <Link to={`/query/${id}/edit`}>
+                  <Edit className="h-4 w-4" />
+                  Edit Query
+                </Link>
+              </Button>
+            )}
             {isOwner && (
               <Button 
                 variant="outline"

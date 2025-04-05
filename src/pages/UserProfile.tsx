@@ -21,14 +21,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { IdCard, BellRing, ArrowLeft, Upload } from "lucide-react";
+import { BellRing, ArrowLeft, Upload } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const profileSchema = z.object({
   fullName: z.string().min(2, { message: "Name must be at least 2 characters" }),
   mobileNumber: z.string().min(10, { message: "Please enter a valid mobile number" }),
-  cashierWindow: z.string().optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -63,7 +62,6 @@ const UserProfile = () => {
     defaultValues: {
       fullName: user?.name || "",
       mobileNumber: user?.mobileNumber || "",
-      cashierWindow: user?.cashierWindow || "",
     },
   });
 
@@ -99,7 +97,6 @@ const UserProfile = () => {
           ...user!,
           name: data.fullName,
           mobileNumber: data.mobileNumber,
-          cashierWindow: data.cashierWindow,
         });
       }
       
@@ -219,28 +216,6 @@ const UserProfile = () => {
                         </FormControl>
                         <FormDescription>
                           You'll receive notifications when your query status changes.
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="cashierWindow"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Preferred Cashier Window</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="Window Number (e.g. Window 1)" 
-                            {...field} 
-                            className="transition-all focus:border-sky-300 hover:border-sky-200" 
-                            disabled={viewOnly}
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Specify which cashier window you usually visit.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>

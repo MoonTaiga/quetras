@@ -20,7 +20,6 @@ export interface QueryDetailData {
   time: string;
   status: "new" | "processing" | "pending" | "completed" | "cancelled";
   timestamp?: string; // ISO date string
-  cashierWindow?: string;
   hasOtherPayments?: boolean;
   timeline?: {
     date: string;
@@ -42,6 +41,12 @@ const QueryDetail = ({ query, className }: QueryDetailProps) => {
   
   // Function to cancel a query (for users)
   const cancelQuery = () => {
+    // Check if the current user is the owner of the query
+    if (!isOwner) {
+      toast.error("You can only cancel your own queries");
+      return;
+    }
+    
     // Get all queries from localStorage
     const storedQueries = localStorage.getItem("quetras_queries");
     if (storedQueries) {
@@ -72,6 +77,11 @@ const QueryDetail = ({ query, className }: QueryDetailProps) => {
 
   // Function to add a note (for admins)
   const addNote = () => {
+    if (!isAdmin) {
+      toast.error("Only admins can add notes");
+      return;
+    }
+    
     if (note.trim()) {
       // In a real app, this would make an API call to add the note to the query
       
@@ -92,6 +102,9 @@ const QueryDetail = ({ query, className }: QueryDetailProps) => {
 
   // Check if this query belongs to the current user
   const isOwner = user?.id === query.studentId;
+  
+  // Check if user can edit this query
+  const canEdit = isAdmin || isOwner;
 
   return (
     <div className={className}>
@@ -103,7 +116,6 @@ const QueryDetail = ({ query, className }: QueryDetailProps) => {
           studentId={query.studentId}
           studentName={query.studentName}
           timestamp={query.timestamp}
-          cashierWindow={query.cashierWindow}
         />
         <CardContent className="p-6">
           <QueryInfo 
@@ -112,7 +124,6 @@ const QueryDetail = ({ query, className }: QueryDetailProps) => {
             date={query.date}
             time={query.time}
             description={query.description}
-            cashierWindow={query.cashierWindow}
           />
           
           <QueryActions 
@@ -122,6 +133,7 @@ const QueryDetail = ({ query, className }: QueryDetailProps) => {
             status={query.status}
             isAdmin={isAdmin}
             isOwner={isOwner}
+            canEdit={canEdit}
             showNoteForm={showNoteForm}
             setShowNoteForm={setShowNoteForm}
             note={note}

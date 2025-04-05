@@ -14,7 +14,6 @@ interface QueryHeaderProps {
   studentId?: string;
   studentName?: string;
   timestamp?: string; // ISO string
-  cashierWindow?: string;
 }
 
 export const QueryHeader = ({ 
@@ -23,8 +22,7 @@ export const QueryHeader = ({
   status, 
   studentId, 
   studentName, 
-  timestamp, 
-  cashierWindow 
+  timestamp
 }: QueryHeaderProps) => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
   
@@ -47,12 +45,6 @@ export const QueryHeader = ({
         <div className="flex-1">
           <div className="text-sm text-muted-foreground">Query #{id}</div>
           <CardTitle className="mt-1">{title}</CardTitle>
-          
-          {cashierWindow && (
-            <div className="mt-1 text-sm text-muted-foreground">
-              Cashier: {cashierWindow}
-            </div>
-          )}
           
           {timestamp && formattedTime && (
             <div className="flex items-center mt-1 text-sm text-muted-foreground">

@@ -29,9 +29,10 @@ import { QueryDetailData } from "@/components/queries/QueryDetail";
 const QueryEdit = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { isAdmin, isLoggedIn } = useAuth();
+  const { isAdmin, isLoggedIn, user } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
   const [query, setQuery] = useState<QueryDetailData | null>(null);
+  const [isAuthorized, setIsAuthorized] = useState(false);
   
   // Form state
   const [queryTitle, setQueryTitle] = useState("");
@@ -56,10 +57,19 @@ const QueryEdit = () => {
           if (foundQuery) {
             setQuery(foundQuery);
             
-            // Initialize form with query data
-            setQueryTitle(foundQuery.queryTitle || "");
-            setStatus(foundQuery.status || "new");
-            setDescription(foundQuery.description || "");
+            // Check if user is authorized to edit this query
+            if (isAdmin || (user?.id === foundQuery.studentId)) {
+              setIsAuthorized(true);
+              
+              // Initialize form with query data
+              setQueryTitle(foundQuery.queryTitle || "");
+              setStatus(foundQuery.status || "new");
+              setDescription(foundQuery.description || "");
+            } else {
+              // User is not authorized to edit this query
+              toast.error("You don't have permission to edit this query");
+              navigate(`/query/${id}`);
+            }
           } else {
             // Query not found, navigate back to queries list
             toast.error("Query not found");
@@ -74,14 +84,14 @@ const QueryEdit = () => {
       // No ID provided, navigate back to queries list
       navigate("/queries");
     }
-  }, [id, isLoggedIn, navigate]);
+  }, [id, isLoggedIn, navigate, isAdmin, user?.id]);
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!isLoggedIn) {
-      toast.error("You must be logged in to update a query");
-      navigate("/login");
+    if (!isLoggedIn || !isAuthorized) {
+      toast.error("You do not have permission to update this query");
+      navigate(`/query/${id}`);
       return;
     }
     
@@ -135,6 +145,30 @@ const QueryEdit = () => {
       }
     }
   };
+  
+  if (!isAuthorized) {
+    return (
+      <main className="min-h-screen flex flex-col bg-background">
+        <Header />
+        <Container className="flex-1 py-8 animate-fade-in" withGlass={false}>
+          <div className="flex justify-center items-center h-full">
+            <div className="text-center">
+              <h2 className="text-xl font-semibold mb-2">Access Denied</h2>
+              <p className="text-muted-foreground">You don't have permission to edit this query.</p>
+              <Button 
+                variant="outline" 
+                className="mt-4"
+                onClick={() => navigate("/queries")}
+              >
+                Back to Queries
+              </Button>
+            </div>
+          </div>
+        </Container>
+        <Footer />
+      </main>
+    );
+  }
   
   if (!query) {
     return (
