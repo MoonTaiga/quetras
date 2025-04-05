@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Bell, X, Plus } from "lucide-react";
+import { Bell, X, Plus, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { notificationService } from "@/lib/notification-service";
@@ -19,6 +19,7 @@ interface QueryActionsProps {
   setNote: (note: string) => void;
   cancelQuery: () => void;
   addNote: () => void;
+  hasOtherPayments?: boolean;
 }
 
 export const QueryActions = ({
@@ -33,7 +34,8 @@ export const QueryActions = ({
   note,
   setNote,
   cancelQuery,
-  addNote
+  addNote,
+  hasOtherPayments
 }: QueryActionsProps) => {
   const navigate = useNavigate();
 
@@ -54,6 +56,17 @@ export const QueryActions = ({
 
   return (
     <div>
+      {hasOtherPayments && (
+        <div className="mb-4 bg-sky-50 border border-sky-100 rounded-md p-3">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 text-sky-600" />
+            <p className="text-sm text-sky-800">
+              This query includes additional payments to be processed.
+            </p>
+          </div>
+        </div>
+      )}
+      
       {showNoteForm && isAdmin && (
         <div className="mt-6 bg-muted p-4 rounded-lg">
           <div className="flex justify-between items-center mb-2">

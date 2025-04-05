@@ -18,9 +18,10 @@ export interface QueryDetailData {
   description: string;
   date: string;
   time: string;
-  status: "new" | "processing";
+  status: "new" | "processing" | "pending" | "completed" | "cancelled";
   timestamp?: string; // ISO date string
   cashierWindow?: string;
+  hasOtherPayments?: boolean;
   timeline?: {
     date: string;
     title: string;
@@ -127,6 +128,7 @@ const QueryDetail = ({ query, className }: QueryDetailProps) => {
             setNote={setNote}
             cancelQuery={cancelQuery}
             addNote={addNote}
+            hasOtherPayments={query.hasOtherPayments}
           />
         </CardContent>
       </Card>

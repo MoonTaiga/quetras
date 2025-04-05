@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Plus, HelpCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Footer } from "@/components/layout/Footer";
 import {
@@ -17,6 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { OtherPaymentsInfo } from "@/components/queries/OtherPaymentsInfo";
 
 const NewQuery = () => {
   const navigate = useNavigate();
@@ -25,6 +26,8 @@ const NewQuery = () => {
   
   // Form state
   const [queryTitle, setQueryTitle] = useState("");
+  const [hasOtherPayments, setHasOtherPayments] = useState(false);
+  const [showPaymentInfo, setShowPaymentInfo] = useState(false);
 
   useEffect(() => {
     // Redirect to login if not logged in
@@ -59,9 +62,11 @@ const NewQuery = () => {
     const newQuery = {
       id: newQueryId,
       studentName: user?.name || "Anonymous",
+      studentId: user?.id || "unknown",
       queryTitle: queryTitle,
       date: new Date().toISOString().split('T')[0],
       status: "new",
+      hasOtherPayments: hasOtherPayments,
     };
     
     // Add new query to existing queries
@@ -82,6 +87,13 @@ const NewQuery = () => {
         // Send notification email (in a real app)
         toast.success("You are in the top 10 queries!", {
           description: "You will receive notifications about your query status.",
+        });
+      }
+      
+      // Show additional information if user has other payments
+      if (hasOtherPayments) {
+        toast.info("Additional payments noted", {
+          description: "We've recorded that you have other payments to process.",
         });
       }
       
@@ -119,9 +131,20 @@ const NewQuery = () => {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-4">
                   <div>
-                    <label htmlFor="queryTitle" className="block text-sm font-medium mb-1 text-foreground">
-                      Query Title
-                    </label>
+                    <div className="flex justify-between items-center mb-1">
+                      <label htmlFor="queryTitle" className="block text-sm font-medium text-foreground">
+                        Query Title
+                      </label>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm"
+                        className={`px-3 py-1 h-auto text-xs ${hasOtherPayments ? 'bg-sky-100 text-sky-700 border-sky-200' : ''}`}
+                        onClick={() => setHasOtherPayments(!hasOtherPayments)}
+                      >
+                        {hasOtherPayments ? 'With Other Payment ✓' : 'With Other Payment'}
+                      </Button>
+                    </div>
                     <Input
                       id="queryTitle"
                       placeholder="e.g., Scholarship Application, Refund Request"
@@ -130,7 +153,33 @@ const NewQuery = () => {
                       required
                     />
                   </div>
+
+                  {hasOtherPayments && (
+                    <div className="bg-sky-50 rounded-md p-3 border border-sky-100">
+                      <div className="flex items-start gap-2">
+                        <HelpCircle className="h-5 w-5 text-sky-600 mt-0.5 flex-shrink-0" />
+                        <p className="text-sm text-sky-800">
+                          You've indicated you have other payments to be processed. 
+                          Our staff will guide you through consolidating multiple payments when handling your query.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex justify-end">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowPaymentInfo(!showPaymentInfo)}
+                      className="text-xs text-muted-foreground"
+                    >
+                      Need help with multiple payments?
+                    </Button>
+                  </div>
                 </div>
+                
+                {showPaymentInfo && <OtherPaymentsInfo onClose={() => setShowPaymentInfo(false)} />}
                 
                 <Button 
                   type="submit" 
