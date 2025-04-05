@@ -10,7 +10,7 @@ import { Clock } from "lucide-react";
 interface QueryHeaderProps {
   id: string;
   title: string;
-  status: "new" | "processing";
+  status: "new" | "processing" | "pending" | "completed" | "cancelled";
   studentId?: string;
   studentName?: string;
   timestamp?: string; // ISO string
