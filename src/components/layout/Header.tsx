@@ -1,16 +1,39 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { useAuth } from "@/contexts/AuthContext";
 import { Logo } from "@/components/layout/Logo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { User, LogOut } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export const Header: React.FC = () => {
   const { user, isLoggedIn, logout } = useAuth();
   const navigate = useNavigate();
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+
+  useEffect(() => {
+    if (user?.id) {
+      const storedImage = localStorage.getItem(`profile_image_${user.id}`);
+      if (storedImage) {
+        setProfileImage(storedImage);
+      }
+    }
+  }, [user]);
 
   const handleLogout = () => {
     logout();
@@ -48,20 +71,48 @@ export const Header: React.FC = () => {
           <ThemeToggle />
           {isLoggedIn ? (
             <div className="flex items-center gap-3">
-              <Button variant="ghost" asChild className="hover:bg-accent flex gap-2">
+              <Button variant="ghost" asChild className="hover:bg-accent flex gap-2 items-center">
                 <Link to="/profile">
-                  <User className="h-4 w-4" />
+                  {profileImage ? (
+                    <Avatar className="h-8 w-8 mr-2">
+                      <AvatarImage src={profileImage} alt={user?.name || "User"} />
+                      <AvatarFallback>{user?.name?.split(" ").map(n => n[0]).join("") || "U"}</AvatarFallback>
+                    </Avatar>
+                  ) : (
+                    <User className="h-4 w-4 mr-2" />
+                  )}
                   <span>{user?.name?.split(" ")[0]}</span>
                 </Link>
               </Button>
-              <Button 
-                variant="ghost" 
-                onClick={handleLogout} 
-                className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
-              </Button>
+              
+              <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Logout Confirmation</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to log out of your account?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel onClick={() => setShowLogoutDialog(false)}>Cancel</AlertDialogCancel>
+                    <AlertDialogAction 
+                      onClick={handleLogout}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Log Out
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           ) : (
             <div className="flex items-center gap-2">

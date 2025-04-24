@@ -23,13 +23,45 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setTheme("dark");
       document.documentElement.classList.add("dark");
     }
-  }, []);
+    
+    // Apply additional CSS variables for better dark mode text visibility
+    const updateCssVariables = () => {
+      const root = document.documentElement;
+      if (theme === "dark") {
+        // Ensure text is clearly visible in dark mode
+        root.style.setProperty("--text-primary", "255, 255, 255");
+        root.style.setProperty("--text-secondary", "200, 200, 210");
+        root.style.setProperty("--text-muted", "160, 160, 180");
+      } else {
+        // Restore light mode text colors
+        root.style.setProperty("--text-primary", "0, 0, 0");
+        root.style.setProperty("--text-secondary", "50, 50, 60");
+        root.style.setProperty("--text-muted", "100, 100, 120");
+      }
+    };
+    
+    updateCssVariables();
+  }, [theme]);
 
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
     localStorage.setItem("quetras_theme", newTheme);
     document.documentElement.classList.toggle("dark", newTheme === "dark");
+    
+    // Update CSS variables when toggling theme
+    const root = document.documentElement;
+    if (newTheme === "dark") {
+      // Ensure text is clearly visible in dark mode
+      root.style.setProperty("--text-primary", "255, 255, 255");
+      root.style.setProperty("--text-secondary", "200, 200, 210");
+      root.style.setProperty("--text-muted", "160, 160, 180");
+    } else {
+      // Restore light mode text colors
+      root.style.setProperty("--text-primary", "0, 0, 0");
+      root.style.setProperty("--text-secondary", "50, 50, 60");
+      root.style.setProperty("--text-muted", "100, 100, 120");
+    }
   };
 
   return (

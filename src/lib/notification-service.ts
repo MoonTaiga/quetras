@@ -36,5 +36,32 @@ export const notificationService = {
       success: true,
       message: `Notifications sent to ${studentIds.length} students`,
     };
+  },
+  
+  // Send queue position notification (e.g. "You are now 10th in line")
+  sendQueuePositionNotification: (studentId: string, position: number) => {
+    if (position <= 10) {
+      const message = position === 1 
+        ? "You're next in line! Please prepare to be served soon."
+        : `You are now in position #${position} in the queue.`;
+        
+      return notificationService.sendNotification(
+        studentId,
+        "Queue Update",
+        message
+      );
+    }
+    return { success: false, message: "Position not in notification range" };
+  },
+  
+  // Notify user that their query is now being processed
+  sendProcessingNotification: (studentId: string, queryId: string, cashierWindow?: string) => {
+    const windowInfo = cashierWindow ? ` at ${cashierWindow}` : "";
+    
+    return notificationService.sendNotification(
+      studentId,
+      "Query Status Update",
+      `Your query #${queryId} is now being processed${windowInfo}. Please check the system for more details.`
+    );
   }
 };

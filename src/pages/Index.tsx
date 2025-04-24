@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { 
   CalendarClock, 
-  DollarSign, 
   FileText, 
   Plus, 
   Users 
@@ -19,7 +18,7 @@ import { Footer } from "@/components/layout/Footer";
 import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
-  const { isAdmin, isLoggedIn } = useAuth();
+  const { isAdmin, isLoggedIn, user } = useAuth();
   const navigate = useNavigate();
   const [queries, setQueries] = React.useState<QueryData[]>([]);
   const { toast } = useToast();
@@ -44,33 +43,37 @@ const Index = () => {
     }
   };
 
-  const handleOnlinePayment = () => {
-    if (!isLoggedIn) {
-      navigate("/login");
-    } else {
-      navigate("/online-payment");
-    }
-  };
-
   const handleDeleteQuery = (id: string) => {
     // Get current queries from localStorage
     const storedQueries = localStorage.getItem("quetras_queries");
     if (storedQueries) {
       try {
         const parsedQueries = JSON.parse(storedQueries);
-        // Filter out the query to be deleted
-        const updatedQueries = parsedQueries.filter((query: QueryData) => query.id !== id);
-        // Update localStorage
-        localStorage.setItem("quetras_queries", JSON.stringify(updatedQueries));
-        // Update state
-        setQueries(updatedQueries);
-        // Trigger storage event for other tabs
-        window.dispatchEvent(new Event("storage"));
+        // Find the query to be deleted
+        const queryToDelete = parsedQueries.find((query: QueryData) => query.id === id);
         
-        toast({
-          title: "Query deleted",
-          description: "The query has been successfully deleted.",
-        });
+        // Check if user has permission to delete
+        if (queryToDelete && (isAdmin || user?.id === queryToDelete.studentId)) {
+          // Filter out the query to be deleted
+          const updatedQueries = parsedQueries.filter((query: QueryData) => query.id !== id);
+          // Update localStorage
+          localStorage.setItem("quetras_queries", JSON.stringify(updatedQueries));
+          // Update state
+          setQueries(updatedQueries);
+          // Trigger storage event for other tabs
+          window.dispatchEvent(new Event("storage"));
+          
+          toast({
+            title: "Query deleted",
+            description: "The query has been successfully deleted.",
+          });
+        } else {
+          toast({
+            title: "Permission denied",
+            description: "You don't have permission to delete this query.",
+            variant: "destructive"
+          });
+        }
       } catch (error) {
         console.error("Failed to delete query:", error);
       }
@@ -90,11 +93,6 @@ const Index = () => {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              {!isAdmin && (
-                <Button variant="outline" onClick={handleOnlinePayment}>
-                  Online Payment
-                </Button>
-              )}
               <Button onClick={handleNewQuery}>
                 <Plus className="mr-2 h-4 w-4" />
                 New Query
@@ -102,7 +100,7 @@ const Index = () => {
             </div>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <StatCard
               title="Total Queries"
               value={queries.length.toString()}
@@ -124,14 +122,6 @@ const Index = () => {
               value="1.5 days"
               description="Average resolution time"
               icon={CalendarClock}
-              trend="neutral"
-              trendValue=""
-            />
-            <StatCard
-              title="Total Amount"
-              value={`$${queries.reduce((sum, query) => sum + (query.amount || 0), 0).toFixed(2)}`}
-              description="All queries"
-              icon={DollarSign}
               trend="neutral"
               trendValue=""
             />

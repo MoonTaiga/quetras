@@ -10,6 +10,8 @@ type User = {
   name: string;
   email: string;
   role: UserRole;
+  mobileNumber?: string;
+  cashierWindow?: string;
 };
 
 type AuthContextType = {
@@ -17,8 +19,9 @@ type AuthContextType = {
   isLoggedIn: boolean;
   isAdmin: boolean;
   login: (email: string, password: string) => Promise<boolean>;
-  register: (name: string, email: string, password: string) => Promise<boolean>;
+  register: (name: string, email: string, password: string, mobileNumber?: string, cashierWindow?: string) => Promise<boolean>;
   logout: () => void;
+  updateUserProfile: (updatedUser: User) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -68,6 +71,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         name: foundUser.name,
         email: foundUser.email,
         role: foundUser.role as UserRole,
+        mobileNumber: foundUser.mobileNumber,
+        cashierWindow: foundUser.cashierWindow,
       };
       
       // Store in state and localStorage
@@ -86,7 +91,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const register = async (name: string, email: string, password: string): Promise<boolean> => {
+  const register = async (
+    name: string, 
+    email: string, 
+    password: string,
+    mobileNumber?: string,
+    cashierWindow?: string
+  ): Promise<boolean> => {
     try {
       // In a real app, this would make an API call to register
       // For demo purposes, we'll store in localStorage
@@ -110,6 +121,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email,
         password, // Note: In a real app, you would hash this password
         role: "user" as UserRole, // Default role for new registrations
+        mobileNumber,
+        cashierWindow,
       };
       
       // Add to users array
@@ -126,6 +139,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateUserProfile = (updatedUser: User) => {
+    try {
+      // Update the user in memory
+      setUser(updatedUser);
+      
+      // Update the user in localStorage
+      localStorage.setItem("quetras_user", JSON.stringify(updatedUser));
+      
+      // Also update the user in the users array
+      const existingUsers = JSON.parse(localStorage.getItem("quetras_users") || "[]");
+      const userIndex = existingUsers.findIndex((u: any) => u.id === updatedUser.id);
+      
+      if (userIndex !== -1) {
+        // Preserve the password
+        const password = existingUsers[userIndex].password;
+        existingUsers[userIndex] = { ...updatedUser, password };
+        localStorage.setItem("quetras_users", JSON.stringify(existingUsers));
+      }
+      
+      return true;
+    } catch (error) {
+      console.error("Profile update error:", error);
+      toast.error("Failed to update profile");
+      return false;
+    }
+  };
+
   const logout = () => {
     setUser(null);
     setIsLoggedIn(false);
@@ -135,7 +175,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoggedIn, isAdmin, login, register, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      isLoggedIn, 
+      isAdmin, 
+      login, 
+      register, 
+      logout,
+      updateUserProfile 
+    }}>
       {children}
     </AuthContext.Provider>
   );
