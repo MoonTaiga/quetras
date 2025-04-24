@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { HelpCircle } from "lucide-react";
 import { OtherPaymentsInfo } from "@/components/queries/OtherPaymentsInfo";
 import { Card, CardContent } from "@/components/ui/card";
+import { hasSubmittedQueryToday } from "@/utils/queryUtils";
 
 interface QueryFormProps {
   onSubmitSuccess?: () => void;
@@ -18,7 +18,6 @@ const QueryForm: React.FC<QueryFormProps> = ({ onSubmitSuccess }) => {
   const { user, isLoggedIn } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Form state
   const [queryTitle, setQueryTitle] = useState("");
   const [hasOtherPayments, setHasOtherPayments] = useState(false);
   const [showPaymentInfo, setShowPaymentInfo] = useState(false);
@@ -26,7 +25,7 @@ const QueryForm: React.FC<QueryFormProps> = ({ onSubmitSuccess }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!isLoggedIn) {
+    if (!isLoggedIn || !user?.id) {
       toast.error("You must be logged in to submit a query");
       navigate("/login");
       return;
@@ -37,15 +36,17 @@ const QueryForm: React.FC<QueryFormProps> = ({ onSubmitSuccess }) => {
       return;
     }
 
+    if (hasSubmittedQueryToday(user.id)) {
+      toast.error("You can only submit one query per day. Please try again tomorrow.");
+      return;
+    }
+
     setIsSubmitting(true);
 
-    // Get existing queries to determine query number
     const existingQueries = JSON.parse(localStorage.getItem("quetras_queries") || "[]");
     
-    // Generate a new query ID
     const newQueryId = `TQ-${Math.floor(1000 + Math.random() * 9000)}`;
     
-    // Create new query object
     const newQuery = {
       id: newQueryId,
       studentName: user?.name || "Anonymous",
@@ -56,10 +57,8 @@ const QueryForm: React.FC<QueryFormProps> = ({ onSubmitSuccess }) => {
       hasOtherPayments: hasOtherPayments,
     };
     
-    // Add new query to existing queries
     const updatedQueries = [newQuery, ...existingQueries];
     
-    // Save to localStorage
     localStorage.setItem("quetras_queries", JSON.stringify(updatedQueries));
     
     setTimeout(() => {
@@ -69,27 +68,22 @@ const QueryForm: React.FC<QueryFormProps> = ({ onSubmitSuccess }) => {
         description: `Your query ID is ${newQueryId}`,
       });
       
-      // Check if this query is in top 10
       if (updatedQueries.length <= 10) {
-        // Send notification email (in a real app)
         toast.success("You are in the top 10 queries!", {
           description: "You will receive notifications about your query status.",
         });
       }
       
-      // Show additional information if user has other payments
       if (hasOtherPayments) {
         toast.info("Additional payments noted", {
           description: "We've recorded that you have other payments to process.",
         });
       }
       
-      // Callback if provided
       if (onSubmitSuccess) {
         onSubmitSuccess();
       }
       
-      // Redirect to the queries list
       navigate("/queries");
     }, 1000);
   };
