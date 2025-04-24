@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
@@ -41,7 +42,6 @@ const mockQueryDetails: Record<string, QueryDetailData> = {
     time: "02:15 PM",
     status: "processing",
     timestamp: "2023-09-18T14:15:00Z",
-    cashierWindow: "Window 1",
     timeline: [
       {
         date: "September 18, 2023 - 02:15 PM",
@@ -65,7 +65,6 @@ const mockQueryDetails: Record<string, QueryDetailData> = {
     time: "11:45 AM",
     status: "new",
     timestamp: "2023-09-20T11:45:00Z",
-    cashierWindow: "Window 2",
     timeline: [
       {
         date: "September 20, 2023 - 11:45 AM",
@@ -84,7 +83,6 @@ const mockQueryDetails: Record<string, QueryDetailData> = {
     time: "09:30 AM",
     status: "new",
     timestamp: "2023-09-22T09:30:00Z",
-    cashierWindow: "Window 1",
     timeline: [
       {
         date: "September 22, 2023 - 09:30 AM",
