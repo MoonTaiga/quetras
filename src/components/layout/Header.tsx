@@ -24,6 +24,7 @@ export const Header: React.FC = () => {
   const { user, isLoggedIn, logout } = useAuth();
   const navigate = useNavigate();
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   useEffect(() => {
     if (user?.id) {
@@ -84,7 +85,7 @@ export const Header: React.FC = () => {
                 </Link>
               </Button>
               
-              <AlertDialog>
+              <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
                 <AlertDialogTrigger asChild>
                   <Button 
                     variant="ghost" 
@@ -102,7 +103,7 @@ export const Header: React.FC = () => {
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel onClick={() => setShowLogoutDialog(false)}>Cancel</AlertDialogCancel>
                     <AlertDialogAction 
                       onClick={handleLogout}
                       className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
