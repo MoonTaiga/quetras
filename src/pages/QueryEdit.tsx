@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
@@ -34,19 +33,16 @@ const QueryEdit = () => {
   const [query, setQuery] = useState<QueryDetailData | null>(null);
   const [isAuthorized, setIsAuthorized] = useState(false);
   
-  // Form state
   const [queryTitle, setQueryTitle] = useState("");
   const [status, setStatus] = useState<"new" | "processing" | "pending" | "completed" | "cancelled">("new");
   const [description, setDescription] = useState("");
   
   useEffect(() => {
-    // Redirect to login if not logged in
     if (!isLoggedIn) {
       navigate("/login");
       return;
     }
     
-    // Load query data if ID exists
     if (id) {
       const storedQueries = localStorage.getItem("quetras_queries");
       if (storedQueries) {
@@ -57,21 +53,17 @@ const QueryEdit = () => {
           if (foundQuery) {
             setQuery(foundQuery);
             
-            // Check if user is authorized to edit this query
             if (isAdmin || (user?.id === foundQuery.studentId)) {
               setIsAuthorized(true);
               
-              // Initialize form with query data
               setQueryTitle(foundQuery.queryTitle || "");
               setStatus(foundQuery.status || "new");
               setDescription(foundQuery.description || "");
             } else {
-              // User is not authorized to edit this query
               toast.error("You don't have permission to edit this query");
               navigate(`/query/${id}`);
             }
           } else {
-            // Query not found, navigate back to queries list
             toast.error("Query not found");
             navigate("/queries");
           }
@@ -81,7 +73,6 @@ const QueryEdit = () => {
         }
       }
     } else {
-      // No ID provided, navigate back to queries list
       navigate("/queries");
     }
   }, [id, isLoggedIn, navigate, isAdmin, user?.id]);
@@ -102,17 +93,14 @@ const QueryEdit = () => {
     
     setIsSaving(true);
     
-    // Get current queries from localStorage
     const storedQueries = localStorage.getItem("quetras_queries");
     if (storedQueries && id) {
       try {
         const queries = JSON.parse(storedQueries);
         
-        // Find the query to update
         const queryIndex = queries.findIndex((q: any) => q.id === id);
         
         if (queryIndex !== -1) {
-          // Update query with form data
           queries[queryIndex] = {
             ...queries[queryIndex],
             queryTitle,
@@ -120,19 +108,15 @@ const QueryEdit = () => {
             description,
           };
           
-          // Save updated queries to localStorage
           localStorage.setItem("quetras_queries", JSON.stringify(queries));
           
-          // Simulate asynchronous operation
           setTimeout(() => {
             setIsSaving(false);
             toast.success("Query updated successfully");
             
-            // Trigger storage event for other tabs
             window.dispatchEvent(new Event("storage"));
             
-            // Navigate back to query details
-            navigate(`/query/${id}`);
+            navigate("/queries");
           }, 1000);
         } else {
           setIsSaving(false);
