@@ -1,10 +1,9 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Bell, X, Plus, AlertCircle, Edit } from "lucide-react";
+import { X, Plus, AlertCircle, Edit } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { notificationService } from "@/lib/notification-service";
 
 interface QueryActionsProps {
   id: string;
@@ -41,19 +40,8 @@ export const QueryActions = ({
 }: QueryActionsProps) => {
   const navigate = useNavigate();
 
-  // Function to navigate to the new query page
   const handleAddQuery = () => {
     navigate("/query/new");
-  };
-
-  // Function to send a notification to the student
-  const sendNotification = () => {
-    notificationService.sendNotification(
-      studentId,
-      `Update on Query #${id}`,
-      `Your ${queryTitle.toLowerCase()} query has been updated. Current status: ${status}.`
-    );
-    toast.success("Notification sent to student");
   };
 
   return (
@@ -94,7 +82,6 @@ export const QueryActions = ({
 
       <div className="mt-6 flex flex-wrap gap-3">
         {isAdmin ? (
-          // Admin-only actions
           <>
             <Button 
               className="transition-all hover:scale-105"
@@ -107,14 +94,6 @@ export const QueryActions = ({
               className="transition-all hover:shadow-soft"
             >
               Add Note
-            </Button>
-            <Button 
-              variant="outline"
-              onClick={sendNotification}
-              className="flex items-center gap-2 transition-all hover:shadow-soft"
-            >
-              <Bell className="h-4 w-4" />
-              Notify Student
             </Button>
             {canEdit && (
               <Button
@@ -130,7 +109,6 @@ export const QueryActions = ({
             )}
           </>
         ) : (
-          // User-only actions
           <>
             <Button 
               onClick={handleAddQuery} 
