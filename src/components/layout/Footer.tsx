@@ -17,7 +17,7 @@ export const Footer = () => {
           
           <div className="flex items-center gap-6">
             <a 
-              href="mailto:contact@quetras.com" 
+              href="jrexbutdiff@gmail.com" 
               className="text-sky-600 hover:text-sky-800 transition-colors"
               aria-label="Email"
             >
@@ -33,7 +33,7 @@ export const Footer = () => {
               <Instagram className="h-5 w-5" />
             </a>
             <a 
-              href="https://facebook.com" 
+              href="https://www.facebook.com/moontaiga.me/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-sky-600 hover:text-sky-800 transition-colors"
