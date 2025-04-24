@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
@@ -19,7 +18,6 @@ const mockQueryDetails: Record<string, QueryDetailData> = {
     time: "10:30 AM",
     status: "processing",
     timestamp: "2023-09-15T10:30:00Z",
-    cashierWindow: "Window 3",
     timeline: [
       {
         date: "September 15, 2023 - 10:30 AM",

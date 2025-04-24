@@ -76,3 +76,4 @@ export const QueryHeader = ({
     </CardHeader>
   );
 };
+

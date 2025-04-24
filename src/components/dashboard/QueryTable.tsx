@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import {
@@ -11,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Edit, Trash2 } from "lucide-react";
 import {
   AlertDialog,
@@ -46,21 +46,12 @@ const QueryTable = ({ queries, className, onDeleteQuery }: QueryTableProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, isAdmin } = useAuth();
-
-  const handleDelete = (id: string) => {
-    if (onDeleteQuery) {
-      onDeleteQuery(id);
-      toast({
-        title: "Query deleted",
-        description: "The query has been successfully deleted.",
-      });
-    }
-  };
-
-  const handleEdit = (id: string) => {
-    navigate(`/query/${id}/edit`);
-  };
   
+  // Function to check if user can edit a query
+  const canEditQuery = (queryStudentId: string) => {
+    return isAdmin || (user && user.id === queryStudentId);
+  };
+
   // Function to check if user can delete a query
   const canDeleteQuery = (queryStudentId: string) => {
     return isAdmin || (user && user.id === queryStudentId);
@@ -80,76 +71,98 @@ const QueryTable = ({ queries, className, onDeleteQuery }: QueryTableProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {queries.map((query) => (
-            <TableRow 
-              key={query.id} 
-              className={`transition-colors hover:bg-muted/30 ${
-                query.status === "cancelled" ? "opacity-60" : ""
-              }`}
-            >
-              <TableCell className="font-medium">{query.id}</TableCell>
-              <TableCell>
-                <Link 
-                  to={`/profile?userId=${query.studentId}`}
-                  className="hover:text-primary transition-colors"
-                >
-                  {query.studentName}
-                </Link>
-              </TableCell>
-              <TableCell>{query.queryTitle}</TableCell>
-              <TableCell>{query.date}</TableCell>
-              <TableCell>
-                <StatusBadge status={query.status} />
-              </TableCell>
-              <TableCell className="text-right">
-                <div className="flex items-center justify-end gap-1">
-                  <Button
-                    asChild
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-full h-8 w-8 transition-transform hover:scale-110 hover:bg-muted"
+          {queries.map((query) => {
+            const [profileImage, setProfileImage] = useState<string | null>(null);
+            
+            useEffect(() => {
+              const storedImage = localStorage.getItem(`profile_image_${query.studentId}`);
+              if (storedImage) {
+                setProfileImage(storedImage);
+              }
+            }, [query.studentId]);
+
+            return (
+              <TableRow 
+                key={query.id} 
+                className={`transition-colors hover:bg-muted/30 ${
+                  query.status === "cancelled" ? "opacity-60" : ""
+                }`}
+              >
+                <TableCell className="font-medium">{query.id}</TableCell>
+                <TableCell>
+                  <Link 
+                    to={`/profile?userId=${query.studentId}`}
+                    className="flex items-center gap-2 hover:text-primary transition-colors"
                   >
-                    <Link to={`/query/${query.id}/edit`}>
-                      <Edit className="h-4 w-4" />
-                      <span className="sr-only">Edit query</span>
-                    </Link>
-                  </Button>
-                  
-                  {canDeleteQuery(query.studentId) && (
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="rounded-full h-8 w-8 transition-transform hover:scale-110 hover:bg-destructive/10 hover:text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                          <span className="sr-only">Delete query</span>
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete this query?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the query from the system.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction 
-                            onClick={() => handleDelete(query.id)}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    <Avatar className="h-6 w-6">
+                      {profileImage ? (
+                        <AvatarImage src={profileImage} alt={query.studentName} />
+                      ) : (
+                        <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                          {query.studentName.split(" ").map(n => n[0]).join("")}
+                        </AvatarFallback>
+                      )}
+                    </Avatar>
+                    {query.studentName}
+                  </Link>
+                </TableCell>
+                <TableCell>{query.queryTitle}</TableCell>
+                <TableCell>{query.date}</TableCell>
+                <TableCell>
+                  <StatusBadge status={query.status} />
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex items-center justify-end gap-1">
+                    {canEditQuery(query.studentId) && (
+                      <Button
+                        asChild
+                        variant="ghost"
+                        size="icon"
+                        className="rounded-full h-8 w-8 transition-transform hover:scale-110 hover:bg-muted"
+                      >
+                        <Link to={`/query/${query.id}/edit`}>
+                          <Edit className="h-4 w-4" />
+                          <span className="sr-only">Edit query</span>
+                        </Link>
+                      </Button>
+                    )}
+                    
+                    {canDeleteQuery(query.studentId) && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="rounded-full h-8 w-8 transition-transform hover:scale-110 hover:bg-destructive/10 hover:text-destructive"
                           >
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  )}
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
+                            <Trash2 className="h-4 w-4" />
+                            <span className="sr-only">Delete query</span>
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete this query?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete the query from the system.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction 
+                              onClick={() => onDeleteQuery && onDeleteQuery(query.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
+                  </div>
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>
