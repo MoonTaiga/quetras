@@ -35,7 +35,6 @@ const About = () => {
                 <ul className="list-disc pl-5 space-y-2 text-gray-700">
                   <li>Easy query submission</li>
                   <li>Real-time status tracking</li>
-                  <li>Online payment options</li>
                   <li>Notification system</li>
                 </ul>
               </div>
@@ -45,7 +44,7 @@ const About = () => {
                 <ul className="list-disc pl-5 space-y-2 text-gray-700">
                   <li>Comprehensive dashboard</li>
                   <li>Query management tools</li>
-                  <li>Payment verification</li>
+                  <li>Analytics and reporting</li>
                   <li>User management system</li>
                 </ul>
               </div>
@@ -67,9 +66,7 @@ const About = () => {
               <li className="transition-all hover:translate-x-1">
                 <strong>Receive updates</strong> - Get notified when your query status changes
               </li>
-              <li className="transition-all hover:translate-x-1">
-                <strong>Make payments</strong> - Pay your tuition fees through our secure online system
-              </li>
+              
             </ol>
           </div>
         </Container>

@@ -234,15 +234,7 @@ const UserProfile = () => {
                 </form>
               </Form>
             </CardContent>
-            {!viewOnly && (
-              <CardFooter className="flex justify-center border-t pt-6">
-                <Button variant="outline" asChild className="transition-all hover:bg-sky-50 hover:scale-105">
-                  <Link to="/online-payment">
-                    Make Online Payment
-                  </Link>
-                </Button>
-              </CardFooter>
-            )}
+          
           </Card>
         </Container>
       </div>

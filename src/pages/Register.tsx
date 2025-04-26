@@ -4,8 +4,6 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, Link } from "react-router-dom";
-import { toast } from "sonner";
-
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,7 +25,6 @@ const registerSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   email: z.string().email({ message: "Please enter a valid email address" }),
   mobileNumber: z.string().min(10, { message: "Please enter a valid mobile number" }),
-  cashierWindow: z.string().optional(),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
   confirmPassword: z.string()
 }).refine(data => data.password === data.confirmPassword, {
@@ -47,7 +44,7 @@ const Register = () => {
       name: "",
       email: "",
       mobileNumber: "",
-      cashierWindow: "",
+
       password: "",
       confirmPassword: "",
     },
@@ -59,7 +56,7 @@ const Register = () => {
       data.email, 
       data.password, 
       data.mobileNumber, 
-      data.cashierWindow
+
     );
     if (success) {
       navigate("/login");
@@ -136,22 +133,8 @@ const Register = () => {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="cashierWindow"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Preferred Cashier Window</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g. Window 1" {...field} className="transition-all focus:border-sky-300 hover:border-sky-200" />
-                      </FormControl>
-                      <FormDescription>
-                        Specify which cashier window you usually visit.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                
+                
                 <FormField
                   control={form.control}
                   name="password"
