@@ -13,7 +13,7 @@ import { Star, User, Clock, MessageSquare } from "lucide-react";
 const reviewData = [
   { 
     id: 1, 
-    name: "Sarah J.", 
+    name: "Mary Claire Neri.", 
     role: "Student",
     content: "QUETRAS made tracking my tuition payments so much easier. I can see the status of my query anytime!",
     rating: 5,
@@ -21,16 +21,16 @@ const reviewData = [
   },
   { 
     id: 2, 
-    name: "Michael T.", 
-    role: "Faculty Member",
+    name: "Nean Ga-a.", 
+    role: "Student",
     content: "As someone who handles student inquiries, this system has streamlined our workflow tremendously.",
     rating: 4,
     date: "1 week ago"
   },
   { 
     id: 3, 
-    name: "David L.", 
-    role: "Student",
+    name: "Ace Lenteria.", 
+    role: "Staff",
     content: "The online payment feature saved me a trip to the bursar's office. Very convenient!",
     rating: 5,
     date: "3 days ago"
@@ -100,7 +100,7 @@ const Home = () => {
                       <Link to="/login">Login Now</Link>
                     </Button>
                   </div>
-                  <div className="flex-1 bg-white p-4 rounded-md shadow transition-all hover:shadow-md hover:translate-y-[-2px]">
+                  {/* <div className="flex-1 bg-white p-4 rounded-md shadow transition-all hover:shadow-md hover:translate-y-[-2px]">
                     <h3 className="font-medium mb-2 text-sky-700">For Administrators</h3>
                     <p className="text-sm mb-4 text-gray-700">Manage the system and oversee all queries</p>
                     <Button 
@@ -109,7 +109,7 @@ const Home = () => {
                     >
                       <Link to="/admin-login">Admin Login</Link>
                     </Button>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>

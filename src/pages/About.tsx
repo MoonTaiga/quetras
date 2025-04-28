@@ -39,7 +39,7 @@ const About = () => {
                 </ul>
               </div>
               
-              <div className="bg-sky-50 p-5 rounded-lg transition-all hover:bg-sky-100 hover:scale-[1.02]">
+              {/* <div className="bg-sky-50 p-5 rounded-lg transition-all hover:bg-sky-100 hover:scale-[1.02]">
                 <h3 className="font-medium text-xl mb-2 text-sky-800">For Administrators</h3>
                 <ul className="list-disc pl-5 space-y-2 text-gray-700">
                   <li>Comprehensive dashboard</li>
@@ -47,7 +47,7 @@ const About = () => {
                   <li>Analytics and reporting</li>
                   <li>User management system</li>
                 </ul>
-              </div>
+              </div> */}
             </div>
           </div>
           

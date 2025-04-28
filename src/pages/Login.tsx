@@ -84,10 +84,10 @@ const Login = () => {
           <CardContent>
             <Alert className="mb-4 bg-muted">
               <AlertDescription>
-                This is a demo application. Register first to create an account, then use those credentials to log in.
-                <div className="mt-2">
+                Register first to create an account, then use those credentials to log in.
+                {/* <div className="mt-2">
                   For admin access, use the <Link to="/admin-login" className="text-sky-600 hover:underline">Admin Login</Link> page.
-                </div>
+                </div> */}
               </AlertDescription>
             </Alert>
             
@@ -132,12 +132,12 @@ const Login = () => {
                 Register
               </Link>
             </div>
-            <div className="text-center text-sm text-muted-foreground">
+            {/* <div className="text-center text-sm text-muted-foreground">
               Need admin access?{" "}
               <Link to="/admin-login" className="text-sky-600 hover:underline">
                 Admin Login
               </Link>
-            </div>
+            </div> */}
           </CardFooter>
         </Card>
       </Container>
