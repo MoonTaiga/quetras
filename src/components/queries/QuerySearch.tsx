@@ -104,7 +104,7 @@ export const QuerySearch = ({
               </SelectItem>
             </SelectContent>
           </Select>
-          <Button type="submit" className="md:w-auto">Search</Button>
+          {/* <Button type="submit" className="md:w-auto">Search</Button> */}
         </form>
       </div>
     </div>
